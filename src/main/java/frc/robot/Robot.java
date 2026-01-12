@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,10 +31,6 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   private double teleopStartTime;
-  private boolean HubState;
-  private boolean HubStateNearChange;
-  private int hubFlips = 0;
-  private double time = 0;
 
   public Robot() {
 
@@ -128,9 +125,6 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("Hub Active", true);
     teleopStartTime = Timer.getFPGATimestamp();
 
-    HubState = HubActive.randomCurrentAllianceActiveFirst();
-    hubFlips = 0;
-    HubStateNearChange = false;
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -139,35 +133,20 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (DriverStation.isFMSAttached()) {
-      time = 220 - DriverStation.getMatchTime();
+    double teleopTimeElapsedSeconds;
+    boolean isFMSAttached = DriverStation.isFMSAttached();
+
+    if (isFMSAttached) {
+      teleopTimeElapsedSeconds = 220 - DriverStation.getMatchTime();
     } else {
-      time = Timer.getFPGATimestamp() - teleopStartTime;
+      teleopTimeElapsedSeconds = Timer.getFPGATimestamp() - teleopStartTime;
     }
 
-    if (time < 10) {
-      SmartDashboard.putBoolean("Hub Active", true);
-      return;
-    }
-    if (DriverStation.isFMSAttached() && hubFlips == 0) {
-      HubState = HubActive.isCurrentAllianceActiveFirst();
-    }
-    // Return when the hub is about to change
-    if (hubFlips < 4 && time >= 10 + hubFlips * 20) {
-      HubStateNearChange = true;
-    }
+    Pair<Boolean, Boolean> hubState =
+        HubActive.getHubState(isFMSAttached, teleopTimeElapsedSeconds);
 
-    if (hubFlips < 4 && time >= 10 + hubFlips * 25) {
-      HubStateNearChange = false;
-      HubState = !HubState;
-      hubFlips++;
-
-    } else if (hubFlips >= 4) {
-
-      HubState = true;
-    }
-    SmartDashboard.putBoolean("Hub Active", HubState);
-    SmartDashboard.putBoolean("Hub Changing", HubStateNearChange);
+    SmartDashboard.putBoolean("Hub Active", hubState.getFirst());
+    SmartDashboard.putBoolean("Hub Changing", hubState.getSecond());
   }
   /** This function is called once when test mode is enabled. */
   @Override
