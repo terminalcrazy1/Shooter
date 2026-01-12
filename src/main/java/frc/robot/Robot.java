@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import java.util.Random;
+import frc.robot.util.HubActive;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -30,9 +30,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   private double teleopStartTime;
-
-  Random rand = new Random();
-  private boolean HubState = rand.nextBoolean();
+  private boolean HubState;
   private int hubFlips = 0;
 
   public Robot() {
@@ -127,7 +125,8 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     SmartDashboard.putBoolean("Hub Active", true);
     teleopStartTime = Timer.getFPGATimestamp();
-
+    HubState = HubActive.randomCurrentAllianceActiveFirst();
+    hubFlips = 0;
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -136,24 +135,25 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (DriverStation.isFMSAttached()) return;
-    if (hubFlips >= 4) {
-      HubState = true;
-      return;
-    }
-
     double teleopElapsed = Timer.getFPGATimestamp() - teleopStartTime;
 
-    if (teleopElapsed >= 10 + hubFlips * 25) {
+    if (teleopElapsed < 10) {
+      SmartDashboard.putBoolean("Hub Active", true);
+      return;
+    }
+    if (DriverStation.isFMSAttached()) {
+      HubState = HubActive.isCurAllianceActiveFirst();
+    } else if (hubFlips < 4 && teleopElapsed >= 10 + hubFlips * 25) {
 
       HubState = !HubState;
       hubFlips++;
-    }
-    if (hubFlips > 0) {
-      SmartDashboard.putBoolean("Hub Active", HubState);
-    }
-  }
 
+    } else if (hubFlips >= 4) {
+
+      HubState = true;
+    }
+    SmartDashboard.putBoolean("Hub Active", HubState);
+  }
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
