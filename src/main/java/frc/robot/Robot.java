@@ -127,7 +127,7 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     SmartDashboard.putBoolean("Hub Active", true);
     teleopStartTime = Timer.getFPGATimestamp();
-    
+
     HubState = HubActive.randomCurrentAllianceActiveFirst();
     hubFlips = 0;
     HubStateNearChange = false;
@@ -140,24 +140,22 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     if (DriverStation.isFMSAttached()) {
-       time = 220 - DriverStation.getMatchTime();
+      time = 220 - DriverStation.getMatchTime();
+    } else {
+      time = Timer.getFPGATimestamp() - teleopStartTime;
     }
-    else{
-       time = Timer.getFPGATimestamp() - teleopStartTime;
-    }
-    
+
     if (time < 10) {
       SmartDashboard.putBoolean("Hub Active", true);
       return;
-
     }
-    if (DriverStation.isFMSAttached() && hubFlips ==0) {
+    if (DriverStation.isFMSAttached() && hubFlips == 0) {
       HubState = HubActive.isCurrentAllianceActiveFirst();
     }
-    //Return when the hub is about to change
+    // Return when the hub is about to change
     if (hubFlips < 4 && time >= 10 + hubFlips * 20) {
       HubStateNearChange = true;
-      }
+    }
 
     if (hubFlips < 4 && time >= 10 + hubFlips * 25) {
       HubStateNearChange = false;
