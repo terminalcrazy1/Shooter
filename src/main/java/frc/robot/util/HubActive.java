@@ -8,7 +8,7 @@ public class HubActive {
   private static Random rand = new Random();
   private static Boolean HubState = rand.nextBoolean();
 
-  public static Boolean isCurAllianceActiveFirst() {
+  public static Boolean isCurrentAllianceActiveFirst() {
     String gameData = DriverStation.getGameSpecificMessage();
     if (gameData == null || gameData.isEmpty()) {
       return null;

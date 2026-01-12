@@ -142,7 +142,7 @@ public class Robot extends LoggedRobot {
       return;
     }
     if (DriverStation.isFMSAttached()) {
-      HubState = HubActive.isCurAllianceActiveFirst();
+      HubState = HubActive.isCurrentAllianceActiveFirst();
     } else if (hubFlips < 4 && teleopElapsed >= 10 + hubFlips * 25) {
 
       HubState = !HubState;
