@@ -31,7 +31,9 @@ public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
   private double teleopStartTime;
   private boolean HubState;
+  private boolean HubStateNearChange;
   private int hubFlips = 0;
+  private double time = 0;
 
   public Robot() {
 
@@ -125,8 +127,10 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     SmartDashboard.putBoolean("Hub Active", true);
     teleopStartTime = Timer.getFPGATimestamp();
+    
     HubState = HubActive.randomCurrentAllianceActiveFirst();
     hubFlips = 0;
+    HubStateNearChange = false;
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -135,16 +139,28 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double teleopElapsed = Timer.getFPGATimestamp() - teleopStartTime;
-
-    if (teleopElapsed < 10) {
+    if (DriverStation.isFMSAttached()) {
+       time = 220 - DriverStation.getMatchTime();
+    }
+    else{
+       time = Timer.getFPGATimestamp() - teleopStartTime;
+    }
+    
+    if (time < 10) {
       SmartDashboard.putBoolean("Hub Active", true);
       return;
-    }
-    if (DriverStation.isFMSAttached()) {
-      HubState = HubActive.isCurrentAllianceActiveFirst();
-    } else if (hubFlips < 4 && teleopElapsed >= 10 + hubFlips * 25) {
 
+    }
+    if (DriverStation.isFMSAttached() && hubFlips ==0) {
+      HubState = HubActive.isCurrentAllianceActiveFirst();
+    }
+    //Return when the hub is about to change
+    if (hubFlips < 4 && time >= 10 + hubFlips * 20) {
+      HubStateNearChange = true;
+      }
+
+    if (hubFlips < 4 && time >= 10 + hubFlips * 25) {
+      HubStateNearChange = false;
       HubState = !HubState;
       hubFlips++;
 
@@ -153,6 +169,7 @@ public class Robot extends LoggedRobot {
       HubState = true;
     }
     SmartDashboard.putBoolean("Hub Active", HubState);
+    SmartDashboard.putBoolean("Hub Changing", HubStateNearChange);
   }
   /** This function is called once when test mode is enabled. */
   @Override
