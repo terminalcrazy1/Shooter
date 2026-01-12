@@ -122,9 +122,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    SmartDashboard.putBoolean("Hub Active", true);
     teleopStartTime = Timer.getFPGATimestamp();
-
+    HubActive.randomizeOnTeleop();
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -144,9 +143,13 @@ public class Robot extends LoggedRobot {
 
     Pair<Boolean, Boolean> hubState =
         HubActive.getHubState(isFMSAttached, teleopTimeElapsedSeconds);
+    double blinkPeriodSeconds = 1;
+    boolean shouldBlink = hubState.getSecond();
+    boolean isLightOn =
+        shouldBlink && (teleopTimeElapsedSeconds % blinkPeriodSeconds > blinkPeriodSeconds / 2);
 
     SmartDashboard.putBoolean("Hub Active", hubState.getFirst());
-    SmartDashboard.putBoolean("Hub Changing", hubState.getSecond());
+    SmartDashboard.putBoolean("Hub Changing", isLightOn);
   }
   /** This function is called once when test mode is enabled. */
   @Override

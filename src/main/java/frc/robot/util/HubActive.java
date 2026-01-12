@@ -17,7 +17,7 @@ public class HubActive {
   private static boolean isAboutToShift = false;
 
   public static Optional<Boolean> isCurrentAllianceActiveFirst(boolean isFMSAttached) {
-    if (isFMSAttached) return Optional.of(isActiveFirstRandomized);
+    if (!isFMSAttached) return Optional.of(isActiveFirstRandomized);
 
     String gameData = DriverStation.getGameSpecificMessage();
 
@@ -62,6 +62,13 @@ public class HubActive {
                 < phaseShiftPeriodSeconds
             : transitionPeriodSeconds - teleopTimeElapsedSeconds < phaseShiftPeriodSeconds;
 
+    if (timeElapsedExcludingTransitionPeriod > 0) isHubActive = true;
+
     return Pair.of(isHubActive, isAboutToShift);
+  }
+
+  public static void randomizeOnTeleop() {
+
+    isActiveFirstRandomized = rand.nextBoolean();
   }
 }
