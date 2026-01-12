@@ -7,8 +7,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.util.Random;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -25,8 +29,14 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private double teleopStartTime;
+
+  Random rand = new Random();
+  private boolean HubState = rand.nextBoolean();
+  private int hubFlips = 0;
 
   public Robot() {
+
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -115,10 +125,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
+    SmartDashboard.putBoolean("Hub Active", true);
+    teleopStartTime = Timer.getFPGATimestamp();
+
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -126,7 +135,24 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if (DriverStation.isFMSAttached()) return;
+    if (hubFlips >= 4) {
+      HubState = true;
+      return;
+    }
+
+    double teleopElapsed = Timer.getFPGATimestamp() - teleopStartTime;
+
+    if (teleopElapsed >= 10 + hubFlips * 25) {
+
+      HubState = !HubState;
+      hubFlips++;
+    }
+    if (hubFlips > 0) {
+      SmartDashboard.putBoolean("Hub Active", HubState);
+    }
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
