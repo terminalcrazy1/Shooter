@@ -62,13 +62,12 @@ public class HubActive {
                 < phaseShiftPeriodSeconds
             : transitionPeriodSeconds - teleopTimeElapsedSeconds < phaseShiftPeriodSeconds;
 
-    if (timeElapsedExcludingTransitionPeriod > 0) isHubActive = true;
+    if (timeElapsedExcludingTransitionPeriod < 0) isHubActive = true;
 
     return Pair.of(isHubActive, isAboutToShift);
   }
 
   public static void randomizeOnTeleop() {
-
     isActiveFirstRandomized = rand.nextBoolean();
   }
 }
