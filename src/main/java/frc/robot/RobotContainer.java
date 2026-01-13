@@ -8,14 +8,11 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -38,7 +35,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Field2d field;
+
   // Subsystems
   private final Drive drive;
 
@@ -52,19 +49,9 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  @AutoLogOutput(key = "PathPlanner/CurrentPose")
-  private Pose2d ppCurrentPose = new Pose2d();
-
-  @AutoLogOutput(key = "PathPlanner/TargetPose")
-  private Pose2d ppTargetPose = new Pose2d();
-
-  @AutoLogOutput(key = "PathPlanner/Path")
-  private Pose2d[] ppPath = new Pose2d[] {};
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    field = new Field2d();
-    SmartDashboard.putData("Field", field);
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -101,23 +88,6 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-    PathPlannerLogging.setLogCurrentPoseCallback(
-        pose -> {
-          ppCurrentPose = pose;
-          field.setRobotPose(pose); // optional dashboard viz
-        });
-
-    PathPlannerLogging.setLogTargetPoseCallback(
-        pose -> {
-          ppTargetPose = pose;
-          field.getObject("TargetPose").setPose(pose);
-        });
-
-    PathPlannerLogging.setLogActivePathCallback(
-        poses -> {
-          ppPath = poses.toArray(Pose2d[]::new);
-          field.getObject("Path").setPoses(poses);
-        });
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

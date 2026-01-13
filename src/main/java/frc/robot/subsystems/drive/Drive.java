@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -49,6 +51,16 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  private final Field2d field;
+
+  @AutoLogOutput(key = "PathPlanner/CurrentPose")
+  private Pose2d ppCurrentPose = new Pose2d();
+
+  @AutoLogOutput(key = "PathPlanner/TargetPose")
+  private Pose2d ppTargetPose = new Pose2d();
+
+  @AutoLogOutput(key = "PathPlanner/Path")
+  private Pose2d[] ppPath = new Pose2d[] {};
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
@@ -113,7 +125,8 @@ public class Drive extends SubsystemBase {
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
-
+    field = new Field2d();
+    SmartDashboard.putData("Field", field);
     // Start odometry thread
     PhoenixOdometryThread.getInstance().start();
 
