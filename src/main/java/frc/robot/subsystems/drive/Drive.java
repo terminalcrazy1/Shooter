@@ -150,7 +150,23 @@ public class Drive extends SubsystemBase {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+    PathPlannerLogging.setLogCurrentPoseCallback(
+        pose -> {
+          ppCurrentPose = pose;
+          field.setRobotPose(pose); // optional dashboard viz
+        });
 
+    PathPlannerLogging.setLogTargetPoseCallback(
+        pose -> {
+          ppTargetPose = pose;
+          field.getObject("TargetPose").setPose(pose);
+        });
+
+    PathPlannerLogging.setLogActivePathCallback(
+        poses -> {
+          ppPath = poses.toArray(Pose2d[]::new);
+          field.getObject("Path").setPoses(poses);
+        });
     // Configure SysId
     sysId =
         new SysIdRoutine(
