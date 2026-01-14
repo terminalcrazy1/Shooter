@@ -2,8 +2,6 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.intake.IntakeIOInputsAutoLogged;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -23,7 +21,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   @AutoLogOutput
-  public Command runVoltsRoller(double inputVolts) {
+  public Command runVoltsIntake(double inputVolts) {
     return startEnd(() -> io.setVolts(inputVolts), () -> io.setVolts(0));
+  }
+
+  public Command runVelocityIntake(double inputVelocity) {
+    return startEnd(() -> io.setVelocity(inputVelocity), () -> io.setVelocity(0));
   }
 }
