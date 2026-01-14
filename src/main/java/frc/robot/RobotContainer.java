@@ -40,8 +40,8 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  // Make the constructor private
-  private IntakeSubsystem intake;
+  // Make the constructor final
+  private final IntakeSubsystem intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -69,6 +69,8 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  // canbus
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -84,6 +86,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        intake = new IntakeSubsystem(new IntakeIOTalonFx(12, "rio"));
+
         break;
 
       case SIM:
@@ -110,6 +115,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        intake = new IntakeSubsystem(new IntakeIO() {});
         break;
     }
 
@@ -150,6 +156,9 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
+
+    // Test intake
+    controller.y().whileTrue(intake.runVoltsIntake(10));
 
     // Lock to 0° when A button is held
     controller
