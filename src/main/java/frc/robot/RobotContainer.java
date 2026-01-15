@@ -162,7 +162,7 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Test intake
-    controller.y().whileTrue(intake.runVoltsIntake(10));
+    controller.y().whileTrue(intake.runVelocityIntake(5));
 
     // Lock to 0° when A button is held
     controller
