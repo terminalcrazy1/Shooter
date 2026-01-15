@@ -49,8 +49,12 @@ public class AllianceFlipUtil {
   }
 
   public static boolean shouldFlip() {
-    return !Constants.disableHAL
-        && DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+    // flip during sim but not replay
+    if (Constants.currentMode == Constants.Mode.REPLAY) {
+      return false;
+    }
+
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+        == DriverStation.Alliance.Red;
   }
 }

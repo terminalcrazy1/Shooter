@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +46,21 @@ public class RobotContainer {
   @AutoLogOutput(key = "currentAllianceHubPos")
   public Pose2d getAllianceHubPosition() {
     return AllianceFlipUtil.apply(FieldConstants.allianceHubPosition);
+  }
+
+  @AutoLogOutput(key = "currentAllianceHubTranslation")
+  public Translation2d getAllianceHubTranslation() {
+    return getAllianceHubPosition().getTranslation();
+  }
+
+  @AutoLogOutput(key = "currentAllianceClimbPos")
+  public Pose2d getAllianceClimbPosition() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceClimbPosition);
+  }
+
+  @AutoLogOutput(key = "currentAllianceClimbTranslation")
+  public Translation2d getAllianceClimbTranslation() {
+    return getAllianceClimbPosition().getTranslation();
   }
 
   // Dashboard inputs
@@ -140,7 +156,7 @@ public class RobotContainer {
                 () -> Rotation2d.kZero));
 
     controller
-        .y()
+        .rightTrigger()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -151,6 +167,7 @@ public class RobotContainer {
                         .getTranslation()
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));
+
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -165,6 +182,7 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+                
   }
 
   /**

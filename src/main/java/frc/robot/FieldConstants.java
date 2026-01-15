@@ -34,12 +34,15 @@ public class FieldConstants {
   public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.WELDED;
 
   // Scoring element positions
-
+  // calculated from feild layout drawings147.47
   public static final Pose2d allianceHubPosition =
       new Pose2d(
-          Units.inchesToMeters(181.56), // calculated from feild layout drawings
+          Units.inchesToMeters(181.56),
           FieldConstants.fieldWidth / 2.0,
           Rotation2d.fromDegrees(180));
+  public static final Pose2d allianceClimbPosition =
+      new Pose2d(
+          Units.inchesToMeters(41.56), Units.inchesToMeters(147.47), Rotation2d.fromDegrees(0));
 
   @Getter
   private enum AprilTagLayoutType {
