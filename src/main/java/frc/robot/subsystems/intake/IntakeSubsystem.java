@@ -8,8 +8,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final IntakeIO io;
-
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Intake/kS", 0.5);
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Intake/kV", 0.5);
   private final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 1);
@@ -18,12 +18,21 @@ public class IntakeSubsystem extends SubsystemBase {
   public IntakeSubsystem(IntakeIO io) {
 
     this.io = io;
+    io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (constants) ->
+            io.setControlConstants(constants[0], constants[1], constants[2], constants[3]),
+        kS,
+        kV,
+        kP,
+        kD);
   }
 
   @AutoLogOutput
@@ -31,7 +40,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return startEnd(() -> io.setVolts(inputVolts), () -> io.setVolts(0));
   }
 
-  public Command runVelocityIntake(double inputVelocity) {
-    return startEnd(() -> io.setVelocity(inputVelocity), () -> io.setVelocity(0));
+  public Command runVelocityIntake(double velocityRadsPerSec) {
+    return startEnd(() -> io.setVelocity(velocityRadsPerSec), () -> io.setVelocity(0));
   }
 }
