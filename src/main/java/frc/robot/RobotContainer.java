@@ -10,7 +10,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +24,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.util.AllianceFlipUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -42,9 +42,10 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
-  // Commands
-  @AutoLogOutput(key = "placeholderHubPos")
-  private final Pose2d placeholderHubPose = new Pose2d(new Translation2d(10, 5), Rotation2d.kZero);
+  @AutoLogOutput(key = "currentAllianceHubPos")
+  public Pose2d getAllianceHubPosition() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceHubPosition);
+  }
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -67,6 +68,7 @@ public class RobotContainer {
         break;
 
       case SIM:
+
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -145,7 +147,7 @@ public class RobotContainer {
                 () -> controller.getLeftY(),
                 () -> controller.getLeftX(),
                 () ->
-                    placeholderHubPose
+                    getAllianceHubPosition()
                         .getTranslation()
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));

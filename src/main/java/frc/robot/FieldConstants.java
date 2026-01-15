@@ -10,6 +10,8 @@ package frc.robot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.IOException;
@@ -23,27 +25,33 @@ import lombok.Getter;
 public class FieldConstants {
 
   // Field dimensions (meters)
-  public static final double fieldLength = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
-  public static final double fieldWidth = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
+  public static final double fieldLength = AprilTagLayoutType.WELDED.getLayout().getFieldLength();
+  public static final double fieldWidth = AprilTagLayoutType.WELDED.getLayout().getFieldWidth();
 
   // AprilTag info
-  public static final int aprilTagCount = AprilTagLayoutType.OFFICIAL.getLayout().getTags().size();
+  public static final int aprilTagCount = AprilTagLayoutType.WELDED.getLayout().getTags().size();
   public static final double aprilTagWidth = Units.inchesToMeters(6.5);
-  public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.OFFICIAL;
+  public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.WELDED;
+
+  // Scoring element positions
+
+  public static final Pose2d allianceHubPosition =
+      new Pose2d(
+          Units.inchesToMeters(181.56), // calculated from feild layout drawings
+          FieldConstants.fieldWidth / 2.0,
+          Rotation2d.fromDegrees(180));
 
   @Getter
-  public enum AprilTagLayoutType {
-    OFFICIAL("2026-official"),
-    NONE("2026-none");
-
+  private enum AprilTagLayoutType {
+    WELDED("apriltags/2026-rebuilt-welded.json");
     private final AprilTagFieldLayout layout;
     private final String layoutString;
 
     AprilTagLayoutType(String name) {
       try {
         // Load JSON from deploy folder
-        Path jsonPath =
-            Path.of(Filesystem.getDeployDirectory().getPath(), "apriltags", name + ".json");
+        Path jsonPath = Path.of(Filesystem.getDeployDirectory().getPath(), name);
+
         layout = new AprilTagFieldLayout(jsonPath);
       } catch (IOException e) {
         throw new RuntimeException("Failed to load AprilTag layout: " + name, e);
