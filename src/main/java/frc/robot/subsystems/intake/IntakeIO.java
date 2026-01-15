@@ -16,7 +16,9 @@ public interface IntakeIO {
 
   default void setVolts(double volts) {}
 
-  default void setVelocity(double volts) {}
+  default void setVelocity(double velocityRadsPerSec) {}
 
   default void updateInputs(IntakeIOInputsAutoLogged inputs) {}
+
+  default void setControlConstants(double kS, double kV, double kP, double kD) {}
 }
