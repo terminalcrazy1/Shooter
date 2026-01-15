@@ -168,7 +168,6 @@ public class RobotContainer {
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));
 
-
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -182,7 +181,6 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
-                
   }
 
   /**
