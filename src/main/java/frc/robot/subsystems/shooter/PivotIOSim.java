@@ -19,9 +19,8 @@ public class PivotIOSim implements PivotIO {
   private final ProfiledPIDController pidController =
       new ProfiledPIDController(0, 0, 0, new Constraints(0.0, 0.0));
 
-  public PivotIOSim(DCMotor motor, double moi, double gearRatio) {
-    this.motorSim =
-        new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moi, gearRatio), motor);
+  public PivotIOSim(double kV, double kA, DCMotor motor) {
+    this.motorSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(kV, kA), motor);
   }
 
   @Override
@@ -32,8 +31,8 @@ public class PivotIOSim implements PivotIO {
 
   @Override
   public void setPosition(double angleRads) {
-      this.targetAngleRads = angleRads;
-      usingTarget = true;
+    this.targetAngleRads = angleRads;
+    usingTarget = true;
   }
 
   @Override
@@ -41,13 +40,12 @@ public class PivotIOSim implements PivotIO {
     if (this.usingTarget) {
       double pidOutput =
           this.pidController.calculate(motorSim.getAngularPositionRad(), this.targetAngleRads);
-      double feedforwardOutput =
-          this.feedforwardController.calculate(pidOutput);
+      double feedforwardOutput = this.feedforwardController.calculate(pidOutput);
 
       this.setVolts(pidOutput + feedforwardOutput);
     }
 
-    this.motorSim.setInputVoltage(appliedVolts);
+    this.motorSim.setInputVoltage(this.appliedVolts);
     this.motorSim.update(0.020);
 
     inputs.appliedVoltage = this.appliedVolts;

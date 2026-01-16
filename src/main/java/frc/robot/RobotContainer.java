@@ -7,10 +7,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +28,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.shooter.PivotIO;
+import frc.robot.subsystems.shooter.PivotIOSim;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.Turret;
 import frc.robot.util.AllianceFlipUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -36,9 +43,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
   // Subsystems
   private final Drive drive;
+  private final Turret turret;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -81,6 +88,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        turret = new Turret(new PivotIO() {}, new PivotIO() {});
         break;
 
       case SIM:
@@ -93,6 +102,17 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        turret =
+            new Turret(
+                new PivotIOSim(
+                    ShooterConstants.TurretHeader.kV,
+                    ShooterConstants.TurretHeader.kA,
+                    DCMotor.getKrakenX60(1)),
+                new PivotIOSim(
+                    ShooterConstants.TurretHood.kV,
+                    ShooterConstants.TurretHood.kA,
+                    DCMotor.getKrakenX60(1)));
         break;
 
       default:
@@ -104,6 +124,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        turret = new Turret(new PivotIO() {}, new PivotIO() {});
         break;
     }
 
@@ -145,16 +167,6 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
-
     controller
         .rightTrigger()
         .whileTrue(
@@ -168,9 +180,6 @@ public class RobotContainer {
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
@@ -181,6 +190,26 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            turret.lockOntoTarget(
+                () -> {
+                  Pose2d drivePose = this.drive.getPose();
+                  Rotation2d driveHeading = drivePose.getRotation();
+                  Translation2d driveToHubVector =
+                      FieldConstants.allianceHubPosition
+                          .getTranslation()
+                          .minus(drivePose.getTranslation());
+                  Rotation2d pointToHubRotation =
+                      new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
+
+                  return pointToHubRotation.minus(driveHeading).getMeasure();
+                },
+                () -> {
+                  return Radians.zero(); // Placeholder
+                }));
   }
 
   /**

@@ -19,25 +19,27 @@ public final class ShooterConstants {
     public static final double WHEEL_RADIUS_METERS = 0.1;
   }
 
-  public static final class Turret {
+  public static final class TurretHeader {
     public static final int CAN_ID = 2;
 
-    public static final double kV = 0;
-    public static final double kA = 0;
+    public static final double kV = 0.1;
+    public static final double kA = 0.1;
     public static final double kS = 0;
 
-    public static final double kP = 0;
+    public static final double kP = 10;
     public static final double kD = 0;
 
     public static final double MAX_VELOCITY = 1.0;
     public static final double MAX_ACCELERATION = 1.0;
+    public static final double MOI = 1.0;
+    public static final double GEAR_RATIO = 1.0 / 52.0;
   }
 
-  public static final class Hood {
+  public static final class TurretHood {
     public static final int CAN_ID = 3;
 
-    public static final double kV = 0;
-    public static final double kA = 0;
+    public static final double kV = 0.1;
+    public static final double kA = 0.1;
     public static final double kS = 0;
 
     public static final double kP = 0;
@@ -45,5 +47,7 @@ public final class ShooterConstants {
 
     public static final double MAX_VELOCITY = 1.0;
     public static final double MAX_ACCELERATION = 1.0;
+    public static final double MOI = 0.01;
+    public static final double GEAR_RATIO = 1.0;
   }
 }
