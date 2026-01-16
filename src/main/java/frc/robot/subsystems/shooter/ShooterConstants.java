@@ -13,6 +13,10 @@ public final class ShooterConstants {
 
     public static final double MAX_VELOCITY = 1.0;
     public static final double MAX_ACCELERATION = 1.0;
+
+    public static final double MOI = 0.01;
+    public static final double GEAR_RATIO = 1.0;
+    public static final double WHEEL_RADIUS_METERS = 0.1;
   }
 
   public static final class Turret {
