@@ -6,7 +6,7 @@ import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class Intake extends SubsystemBase {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
@@ -15,7 +15,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", IntakeConstants.kP);
   private final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", IntakeConstants.kD);
 
-  public IntakeSubsystem(IntakeIO io) {
+  public Intake(IntakeIO io) {
 
     this.io = io;
     io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());

@@ -26,10 +26,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFx;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -45,7 +45,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   // Make the constructor final
-  private final IntakeSubsystem intake;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -91,7 +91,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        intake = new IntakeSubsystem(new IntakeIOTalonFx(12, "rio"));
+        intake = new Intake(new IntakeIOTalonFx(12, "rio"));
 
         break;
 
@@ -106,7 +106,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        intake = new IntakeSubsystem(new IntakeIOSim(DCMotor.getKrakenX60(1), 0.01));
+        intake = new Intake(new IntakeIOSim(DCMotor.getKrakenX60(1), 0.01));
 
         break;
 
@@ -119,7 +119,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        intake = new IntakeSubsystem(new IntakeIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 

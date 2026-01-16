@@ -21,14 +21,14 @@ import frc.robot.util.PhoenixUtil;
 public class IntakeIOTalonFx implements IntakeIO {
   private final TalonFX talon;
   private final TalonFXConfiguration config;
-  private final VoltageOut VoltageOut = new VoltageOut(0.0).withUpdateFreqHz(50.0);
+  private final VoltageOut voltageOut = new VoltageOut(0.0).withUpdateFreqHz(50.0);
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
   private final StatusSignal<Angle> position;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<Voltage> appliedVoltage;
   private final StatusSignal<Current> supplyCurrent;
   private final StatusSignal<Current> torqueCurrent;
-  final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
+  final VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
   public IntakeIOTalonFx(int talonCANId, String canbus) {
     talon = new TalonFX(talonCANId, canbus);
@@ -38,11 +38,11 @@ public class IntakeIOTalonFx implements IntakeIO {
     config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    config.Slot0.kS = 0.1; // Add 0.1 V output to overcome static friction
-    config.Slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    config.Slot0.kP = 0.11; // An error of 1 rps results in 0.11 V output
-    config.Slot0.kI = 0; // no output for integrated error
-    config.Slot0.kD = 0; // no output for error derivative
+    config.Slot0.kS = IntakeConstants.kS;
+    config.Slot0.kV = IntakeConstants.kV;
+    config.Slot0.kP = IntakeConstants.kP;
+    config.Slot0.kD = IntakeConstants.kD;
+    config.Slot0.kI = 0.0;
     config.Feedback.SensorToMechanismRatio =
         IntakeConstants.GEAR_RATIO; // Adjust for gearing constant
     PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(config));
@@ -86,11 +86,11 @@ public class IntakeIOTalonFx implements IntakeIO {
 
   @Override
   public void setVolts(double volts) {
-    talon.setControl(VoltageOut.withOutput(volts));
+    talon.setControl(voltageOut.withOutput(volts));
   }
 
   @Override
   public void setVelocity(double velocityRadPerSec) {
-    talon.setControl(m_request.withVelocity(velocityRadPerSec));
+    talon.setControl(velocityVoltage.withVelocity(velocityRadPerSec));
   }
 }
