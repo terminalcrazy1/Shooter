@@ -1,4 +1,4 @@
-package frc.robot.subsystems.BallTunneler;
+package frc.robot.subsystems.balltunneler;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -6,7 +6,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-
 
 public class BallTunnelerIOSim implements BallTunnelerIO {
   private final DCMotorSim sim;

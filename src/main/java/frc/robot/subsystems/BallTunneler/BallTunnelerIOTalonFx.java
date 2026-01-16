@@ -1,4 +1,4 @@
-package frc.robot.subsystems.BallTunneler;
+package frc.robot.subsystems.balltunneler;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;

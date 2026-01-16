@@ -1,4 +1,4 @@
-package frc.robot.subsystems.BallTunneler;
+package frc.robot.subsystems.balltunneler;
 
 public final class BallTunnelerConstants {
 

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.BallTunneler;
+package frc.robot.subsystems.balltunneler;
 
 import org.littletonrobotics.junction.AutoLog;
 

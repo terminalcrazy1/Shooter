@@ -1,4 +1,4 @@
-package frc.robot.subsystems.BallTunneler;
+package frc.robot.subsystems.balltunneler;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
