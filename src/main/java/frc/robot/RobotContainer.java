@@ -106,7 +106,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        intake = new IntakeSubsystem(new IntakeIOSim(DCMotor.getKrakenX60(1), 1, 0.01));
+        intake = new IntakeSubsystem(new IntakeIOSim(DCMotor.getKrakenX60(1), 0.01));
 
         break;
 
@@ -162,7 +162,7 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Test intake
-    controller.y().whileTrue(intake.runVelocityIntake(5));
+    controller.y().whileTrue(intake.runIntakeVelocityRadsPerSec(5));
 
     // Lock to 0° when A button is held
     controller

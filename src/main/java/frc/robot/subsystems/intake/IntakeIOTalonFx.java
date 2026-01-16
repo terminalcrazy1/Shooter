@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -19,6 +20,7 @@ import frc.robot.util.PhoenixUtil;
 
 public class IntakeIOTalonFx implements IntakeIO {
   private final TalonFX talon;
+  private final TalonFXConfiguration config;
   private final VoltageOut VoltageOut = new VoltageOut(0.0).withUpdateFreqHz(50.0);
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
   private final StatusSignal<Angle> position;
@@ -26,15 +28,23 @@ public class IntakeIOTalonFx implements IntakeIO {
   private final StatusSignal<Voltage> appliedVoltage;
   private final StatusSignal<Current> supplyCurrent;
   private final StatusSignal<Current> torqueCurrent;
+  final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
 
   public IntakeIOTalonFx(int talonCANId, String canbus) {
     talon = new TalonFX(talonCANId, canbus);
-    TalonFXConfiguration config = new TalonFXConfiguration();
+    config = new TalonFXConfiguration();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
+    config.Slot0.kS = 0.1; // Add 0.1 V output to overcome static friction
+    config.Slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
+    config.Slot0.kP = 0.11; // An error of 1 rps results in 0.11 V output
+    config.Slot0.kI = 0; // no output for integrated error
+    config.Slot0.kD = 0; // no output for error derivative
+    config.Feedback.SensorToMechanismRatio =
+        IntakeConstants.GEAR_RATIO; // Adjust for gearing constant
     PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(config));
 
     position = talon.getPosition();
@@ -64,7 +74,23 @@ public class IntakeIOTalonFx implements IntakeIO {
   }
 
   @Override
+  public void setControlConstants(double kS, double kV, double kP, double kD) {
+
+    config.Slot0.kS = kS;
+    config.Slot0.kV = kV;
+    config.Slot0.kP = kP;
+    config.Slot0.kD = kD;
+
+    PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(config));
+  }
+
+  @Override
   public void setVolts(double volts) {
     talon.setControl(VoltageOut.withOutput(volts));
+  }
+
+  @Override
+  public void setVelocity(double velocityRadPerSec) {
+    talon.setControl(m_request.withVelocity(velocityRadPerSec));
   }
 }

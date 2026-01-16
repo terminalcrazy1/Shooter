@@ -13,26 +13,29 @@ public class IntakeIOSim implements IntakeIO {
   private double targetVelocityRadPerSec = 0;
 
   private SimpleMotorFeedforward feedforwardController = new SimpleMotorFeedforward(0.2, 0.01);
-  PIDController feedbackController = new PIDController(5, 0, 0);
+  private PIDController feedbackController = new PIDController(5, 0, 0);
 
-  public IntakeIOSim(DCMotor motor, double reduction, double moi) {
-    sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moi, reduction), motor);
+  public IntakeIOSim(DCMotor motor, double moi) {
+    sim =
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(motor, moi, IntakeConstants.GEAR_RATIO), motor);
   }
 
   @Override
   public void updateInputs(IntakeIOInputsAutoLogged inputs) {
     sim.update(0.02);
 
+    double motorTargetVel = targetVelocityRadPerSec / IntakeConstants.GEAR_RATIO;
+    System.out.println(motorTargetVel);
+    double ffVolts = feedforwardController.calculate(motorTargetVel);
+    double fbVolts =
+        feedbackController.calculate(sim.getAngularVelocityRadPerSec(), motorTargetVel);
+    setVolts(ffVolts + fbVolts);
     inputs.connected = true;
-    inputs.positionRads = sim.getAngularPositionRad();
-    inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.positionRads = sim.getAngularPositionRad() * IntakeConstants.GEAR_RATIO;
+    inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec() * IntakeConstants.GEAR_RATIO;
     inputs.appliedVoltage = appliedVoltage;
     inputs.supplyCurrentAmps = sim.getCurrentDrawAmps();
-    // Velocity Control
-    double ffVolts = feedforwardController.calculate(targetVelocityRadPerSec);
-    double fbVolts =
-        feedbackController.calculate(sim.getAngularVelocityRadPerSec(), targetVelocityRadPerSec);
-    setVolts(ffVolts + fbVolts);
   }
 
   @Override
