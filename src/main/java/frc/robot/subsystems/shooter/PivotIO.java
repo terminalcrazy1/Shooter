@@ -21,4 +21,6 @@ public interface PivotIO {
   public default void updateInputs(PivotIOInputsAutoLogged inputs) {}
 
   public default void setControlConstants(double kS, double kV, double kA, double kP, double kD) {}
+
+  public default void setMotionProfile(double maxVelocity, double maxAcceleration) {}
 }
