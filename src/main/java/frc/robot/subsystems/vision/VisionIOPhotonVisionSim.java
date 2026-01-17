@@ -52,6 +52,12 @@ public class VisionIOPhotonVisionSim implements VisionIO {
     }
 
     SimCameraProperties cameraProperties = new SimCameraProperties();
+    cameraProperties =
+        cameraProperties.setCalibration(
+            640,
+            480,
+            Rotation2d.fromDegrees(
+                91.2)); // limelight4 FOV, calculated from horizontal and vertical
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
 
     visionSim.addCamera(cameraSim, robotToCamera);

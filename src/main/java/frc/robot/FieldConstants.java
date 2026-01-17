@@ -19,15 +19,16 @@ import edu.wpi.first.math.util.Units;
  */
 public class FieldConstants {
 
-  //Built in apriltag  layout
-  //Default is welded, the feild type used in Ontario district
-   public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  // Built in apriltag  layout
+  // Default is welded, the feild type used in Ontario district
+  public static AprilTagFieldLayout aprilTagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Field dimensions (meters)
   public static final double fieldLength = aprilTagLayout.getFieldLength();
   public static final double fieldWidth = aprilTagLayout.getFieldWidth();
 
-  //tag info
+  // tag info
   public static final int aprilTagCount = aprilTagLayout.getTags().size();
   public static final double aprilTagWidth = Units.inchesToMeters(6.5);
 
@@ -36,11 +37,11 @@ public class FieldConstants {
       new Pose2d(
           Units.inchesToMeters(181.56),
           fieldWidth / 2.0,
-          Rotation2d.fromDegrees(180)); //Towards origin
+          Rotation2d.fromDegrees(180)); // Towards origin
 
   public static final Pose2d allianceClimbPosition =
       new Pose2d(
           Units.inchesToMeters(41.56),
           Units.inchesToMeters(147.47),
-          Rotation2d.fromDegrees(0)); //Away from origin
+          Rotation2d.fromDegrees(0)); // Away from origin
 }
