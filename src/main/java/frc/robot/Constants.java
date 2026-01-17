@@ -27,4 +27,28 @@ public final class Constants {
     SIM,
     REPLAY
   }
+
+  public record ModeGains(double kV, double kA, double kS, double kG, double kP, double kD) {}
+
+  public static class ControlSystemGains {
+    public static final ModeGains EMPTY_GAINS = new ModeGains(0, 0, 0, 0, 0, 0);
+    ModeGains rModeGains;
+    ModeGains sModeGains;
+
+    public ControlSystemGains(ModeGains realGains, ModeGains simGains) {
+      rModeGains = realGains;
+      sModeGains = simGains;
+    }
+
+    public ModeGains getGains() {
+      switch (currentMode) {
+        case REAL:
+          return rModeGains;
+        case SIM:
+          return sModeGains;
+        default:
+          return EMPTY_GAINS;
+      }
+    }
+  }
 }
