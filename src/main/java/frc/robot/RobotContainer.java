@@ -10,7 +10,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -49,26 +48,18 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-
+//Log feild element positions
   @AutoLogOutput(key = "currentAllianceHubPos")
   public Pose2d getAllianceHubPosition() {
     return AllianceFlipUtil.apply(FieldConstants.allianceHubPosition);
   }
 
-  @AutoLogOutput(key = "currentAllianceHubTranslation")
-  public Translation2d getAllianceHubTranslation() {
-    return getAllianceHubPosition().getTranslation();
-  }
 
   @AutoLogOutput(key = "currentAllianceClimbPos")
   public Pose2d getAllianceClimbPosition() {
     return AllianceFlipUtil.apply(FieldConstants.allianceClimbPosition);
   }
 
-  @AutoLogOutput(key = "currentAllianceClimbTranslation")
-  public Translation2d getAllianceClimbTranslation() {
-    return getAllianceClimbPosition().getTranslation();
-  }
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
