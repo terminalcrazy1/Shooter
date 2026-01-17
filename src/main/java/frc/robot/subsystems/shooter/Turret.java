@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -76,17 +77,24 @@ public class Turret extends SubsystemBase {
 
   public Command lockOntoTarget(
       Supplier<Angle> headingSupplier, Supplier<Angle> hoodAngleSupplier) {
-    return this.run(
+    return this.runEnd(
         () -> {
           Angle heading = headingSupplier.get();
           Angle hoodAngle = hoodAngleSupplier.get();
 
-          Logger.recordOutput("Shooter/TargetHeading", heading);
-          Logger.recordOutput("Shooter/TargetHoodAngle", hoodAngle);
+          Logger.recordOutput("Shooter/Target/Heading", heading);
+          Logger.recordOutput("Shooter/Target/HoodAngle", hoodAngle);
 
           this.turretHeaderIO.setPosition(heading.in(Radians));
           //   this.turretHoodIO.setPosition(hoodAngle.in(Radians));
+        },
+        () -> {
+          this.turretHeaderIO.stop();
         });
+  }
+
+  public Rotation2d getPivotRotation() {
+    return Rotation2d.fromRadians(this.turretHeaderIOInputs.positionRads);
   }
 
   @Override

@@ -12,6 +12,7 @@ public class PivotIOSim implements PivotIO {
   private double appliedVolts = 0.0;
   private double targetAngleRads = 0.0;
   private boolean usingTarget = false;
+  private boolean stopped = false;
 
   private final DCMotorSim motorSim;
 
@@ -19,34 +20,70 @@ public class PivotIOSim implements PivotIO {
   private final ProfiledPIDController pidController =
       new ProfiledPIDController(0, 0, 0, new Constraints(0.0, 0.0));
 
-  public PivotIOSim(double kV, double kA, DCMotor motor) {
-    this.motorSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(kV, kA), motor);
+  // private static final LoggedTunableNumber testKv = new LoggedTunableNumber("Test/kV",
+  // 0.000365274);
+  // private static final LoggedTunableNumber testKa = new LoggedTunableNumber("Test/kA", 5.707);
+
+  public PivotIOSim(DCMotor motor, double moi, double gearRatio) {
+    this.motorSim =
+        new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moi, gearRatio), motor);
   }
 
   @Override
   public void setVolts(double volts) {
     this.appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     this.usingTarget = false;
+    this.stopped = false;
+  }
+
+  public void setVolts(double volts, boolean useTargetRotation) {
+    this.appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    this.usingTarget = useTargetRotation;
+    this.stopped = false;
   }
 
   @Override
   public void setPosition(double angleRads) {
     this.targetAngleRads = angleRads;
     usingTarget = true;
+    this.stopped = false;
+  }
+
+  @Override
+  public void stop() {
+    this.appliedVolts = 0.0;
   }
 
   @Override
   public void updateInputs(PivotIOInputsAutoLogged inputs) {
-    if (this.usingTarget) {
-      double pidOutput =
-          this.pidController.calculate(motorSim.getAngularPositionRad(), this.targetAngleRads);
-      double feedforwardOutput = this.feedforwardController.calculate(pidOutput);
+    // LoggedTunableNumber.ifChanged(
+    //     hashCode(),
+    //     (constants) -> {
+    //       DCMotorSim testSim =
+    //           new DCMotorSim(
+    //               LinearSystemId.createDCMotorSystem(constants[0], constants[1]),
+    //               DCMotor.getKrakenX60(1));
+    //       System.out.printf(
+    //           "%s | %s\n",
+    //           testSim.getJKgMetersSquared() - TurretHeader.MOI,
+    //           testSim.getGearing() - TurretHeader.GEAR_RATIO);
+    //     },
+    //     testKv,
+    //     testKa);
 
-      this.setVolts(pidOutput + feedforwardOutput);
+    if (!this.stopped) {
+      if (this.usingTarget) {
+        double angRad = motorSim.getAngularPositionRad();
+
+        double pidOutput = this.pidController.calculate(angRad, this.targetAngleRads);
+        double feedforwardOutput = this.feedforwardController.calculate(pidOutput);
+
+        this.setVolts(pidOutput + feedforwardOutput, false);
+      }
+
+      this.motorSim.setInputVoltage(this.appliedVolts);
+      this.motorSim.update(0.020);
     }
-
-    this.motorSim.setInputVoltage(this.appliedVolts);
-    this.motorSim.update(0.020);
 
     inputs.appliedVoltage = this.appliedVolts;
     inputs.supplyCurrentAmps = this.motorSim.getCurrentDrawAmps();

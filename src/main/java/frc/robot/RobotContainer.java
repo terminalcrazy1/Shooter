@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -46,6 +47,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Turret turret;
+  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -106,13 +108,10 @@ public class RobotContainer {
         turret =
             new Turret(
                 new PivotIOSim(
-                    ShooterConstants.TurretHeader.kV,
-                    ShooterConstants.TurretHeader.kA,
-                    DCMotor.getKrakenX60(1)),
-                new PivotIOSim(
-                    ShooterConstants.TurretHood.kV,
-                    ShooterConstants.TurretHood.kA,
-                    DCMotor.getKrakenX60(1)));
+                    DCMotor.getKrakenX60(1),
+                    ShooterConstants.TurretHeader.MOI,
+                    ShooterConstants.TurretHeader.GEAR_RATIO),
+                new PivotIO() {});
         break;
 
       default:
@@ -129,6 +128,7 @@ public class RobotContainer {
         break;
     }
 
+    this.superstructure = new Superstructure(drive, turret, () -> getAllianceHubPosition());
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -199,9 +199,7 @@ public class RobotContainer {
                   Pose2d drivePose = this.drive.getPose();
                   Rotation2d driveHeading = drivePose.getRotation();
                   Translation2d driveToHubVector =
-                      FieldConstants.allianceHubPosition
-                          .getTranslation()
-                          .minus(drivePose.getTranslation());
+                      getAllianceHubTranslation().minus(drivePose.getTranslation());
                   Rotation2d pointToHubRotation =
                       new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
 

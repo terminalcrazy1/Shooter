@@ -22,17 +22,17 @@ public final class ShooterConstants {
   public static final class TurretHeader {
     public static final int CAN_ID = 2;
 
-    public static final double kV = 0.1;
-    public static final double kA = 0.1;
+    public static final double kV = 0.000365274;
+    public static final double kA = 5.7073402;
     public static final double kS = 0;
 
-    public static final double kP = 10;
-    public static final double kD = 0;
+    public static final double kP = 150;
+    public static final double kD = 80;
 
-    public static final double MAX_VELOCITY = 1.0;
-    public static final double MAX_ACCELERATION = 1.0;
-    public static final double MOI = 1.0;
-    public static final double GEAR_RATIO = 1.0 / 52.0;
+    public static final double MAX_VELOCITY = 50;
+    public static final double MAX_ACCELERATION = 500.0;
+    public static final double MOI = 0.0648478785;
+    public static final double GEAR_RATIO = 1 / 52.0;
   }
 
   public static final class TurretHood {
