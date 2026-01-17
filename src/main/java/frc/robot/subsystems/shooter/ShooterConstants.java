@@ -1,5 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import frc.robot.Constants.ControlSystemGains;
+import frc.robot.Constants.ModeGains;
+
 public final class ShooterConstants {
   public static final class Flywheel {
     public static final int CAN_ID = 1;
@@ -22,15 +25,16 @@ public final class ShooterConstants {
   public static final class TurretHeader {
     public static final int CAN_ID = 2;
 
-    public static final double kV = 0.000365274;
-    public static final double kA = 5.7073402;
-    public static final double kS = 0;
+    private static final ControlSystemGains GAINS =
+        new ControlSystemGains(
+            ControlSystemGains.EMPTY_GAINS, new ModeGains(4.44, 0.05, 0, 0, 40, 0));
 
-    public static final double kP = 150;
-    public static final double kD = 80;
+    public static ModeGains getGains() {
+      return GAINS.getGains();
+    }
 
-    public static final double MAX_VELOCITY = 50;
-    public static final double MAX_ACCELERATION = 500.0;
+    public static final double MAX_VELOCITY = 20;
+    public static final double MAX_ACCELERATION = 40.0;
     public static final double MOI = 0.0648478785;
     public static final double GEAR_RATIO = 1 / 52.0;
   }

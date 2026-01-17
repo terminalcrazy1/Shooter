@@ -109,8 +109,8 @@ public class RobotContainer {
             new Turret(
                 new PivotIOSim(
                     DCMotor.getKrakenX60(1),
-                    ShooterConstants.TurretHeader.MOI,
-                    ShooterConstants.TurretHeader.GEAR_RATIO),
+                    ShooterConstants.TurretHeader.getGains().kV(),
+                    ShooterConstants.TurretHeader.getGains().kA()),
                 new PivotIO() {});
         break;
 
