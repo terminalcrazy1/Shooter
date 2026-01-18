@@ -26,7 +26,7 @@ import org.photonvision.simulation.VisionSystemSim;
 /** IO implementation for physics sim using PhotonVision simulator. */
 public class VisionIOPhotonVisionSim implements VisionIO {
   private static VisionSystemSim visionSim;
-
+  private final String name;
   private final PhotonCamera camera;
   private final PhotonCameraSim cameraSim;
   private final Transform3d robotToCamera;
@@ -41,7 +41,7 @@ public class VisionIOPhotonVisionSim implements VisionIO {
    */
   public VisionIOPhotonVisionSim(
       String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
-
+    this.name = name;
     this.camera = new PhotonCamera(name);
     this.robotToCamera = robotToCamera;
     this.poseSupplier = poseSupplier;
@@ -136,5 +136,10 @@ public class VisionIOPhotonVisionSim implements VisionIO {
     for (int id : seenTagIds) {
       inputs.tagIds[idx++] = id;
     }
+  }
+
+  @Override
+  public String getName() {
+    return name;
   }
 }

@@ -10,11 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +30,7 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFx;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.AllianceFlipUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -51,8 +48,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Intake intake;
   // change to final when  realIO is  implemented
-  private Vision positioningVision;
-  private Vision turretVision;
+  private Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -65,6 +61,16 @@ public class RobotContainer {
   @AutoLogOutput(key = "currentAllianceClimbPos")
   public Pose2d getAllianceClimbPosition() {
     return AllianceFlipUtil.apply(FieldConstants.allianceClimbPosition);
+  }
+
+  @AutoLogOutput(key = "TurretTx")
+  public double getTurretTx() {
+    return vision != null ? vision.getTurretTxDegrees() : 0.0;
+  }
+
+  @AutoLogOutput(key = "TurretSeesHubTag")
+  public boolean getTurretSeesHubTag() {
+    return vision.getTurretSeesHubTag();
   }
 
   // Dashboard inputs
@@ -104,36 +110,21 @@ public class RobotContainer {
 
         intake = new Intake(new IntakeIOSim(DCMotor.getKrakenX60(1), 0.01));
 
-        Vision positioningVision =
-            new Vision(
-                (pose, timestamp, stdDevs) -> {
-                  drive.addVisionMeasurement(pose, timestamp, stdDevs);
-                },
+        vision =
+            Vision.createPerCameraVision(
+                drive,
                 new VisionIOPhotonVisionSim(
-                    "FrontCamera",
-                    new Transform3d(
-                        new Translation3d(0.3, 0.0, 0.127),
-                        new Rotation3d(0, Units.degreesToRadians(-30), 0)),
-                    () -> drive.getPose() // suplier
-                    ),
+                    VisionConstants.camera0Name,
+                    VisionConstants.robotToCamera0,
+                    () -> drive.getPose()),
                 new VisionIOPhotonVisionSim(
-                    "BackCamera",
-                    new Transform3d(
-                        new Translation3d(0.3, 0.0, 0.5),
-                        new Rotation3d(0, 0, Units.degreesToRadians(180))), // offset for 2nd cam
+                    VisionConstants.camera1Name,
+                    VisionConstants.robotToCamera1,
+                    () -> drive.getPose()),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera2Name,
+                    VisionConstants.robotToCamera2,
                     () -> drive.getPose()));
-
-        Vision turretVision =
-            new Vision(
-                (pose, timestamp, stdDevs) -> {},
-                new VisionIOPhotonVisionSim(
-                    "TurretCamera",
-                    new Transform3d(
-                        new Translation3d(0.0, 0.0, Units.inchesToMeters(25.25)),
-                        new Rotation3d(0, Units.degreesToRadians(-30), 0)),
-                    () -> drive.getPose()) // Change  to work with  turret
-                );
-
         break;
 
       default:

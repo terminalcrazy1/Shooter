@@ -12,6 +12,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -31,7 +33,8 @@ public class FieldConstants {
   // tag info
   public static final int aprilTagCount = aprilTagLayout.getTags().size();
   public static final double aprilTagWidth = Units.inchesToMeters(6.5);
-
+  public static final List<Integer> hubTagIds =
+      Arrays.asList(18, 19, 20, 21, 24, 25, 26, 27); // tags for blue hub
   // Scoring element positions
   public static final Pose2d allianceHubPosition =
       new Pose2d(

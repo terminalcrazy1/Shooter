@@ -3,140 +3,140 @@ package frc.robot.subsystems.vision;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.FieldConstants;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.VisionUtil;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
-  private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  private final Map<String, VisionConsumer> cameraConsumers;
+  private final Map<String, Integer> cameraNameToIndex = new HashMap<>();
+  private final Drive drive; // Is passing drive in here a bad idea?
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
-    this.consumer = consumer;
+  private double turretTxDegrees = 0.0;
+  private boolean turretSeesHubTag = false;
+
+  public Vision(Drive drive, VisionIO... io) {
     this.io = io;
+    this.drive = drive;
     this.inputs = new VisionIOInputsAutoLogged[io.length];
+    this.disconnectedAlerts = new Alert[io.length];
+    this.cameraConsumers = new HashMap<>();
+
+    // Initalize the camera IOs
     for (int i = 0; i < inputs.length; i++) {
       inputs[i] = new VisionIOInputsAutoLogged();
-    }
-    this.disconnectedAlerts = new Alert[io.length];
-    for (int i = 0; i < inputs.length; i++) {
+      cameraNameToIndex.put(io[i].getName(), i);
       disconnectedAlerts[i] =
-          new Alert(
-              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+          new Alert("Vision camera " + io[i].getName() + " is disconnected.", AlertType.kWarning);
     }
+
+    // Drivetrain camera consumer, outputs to the drivetrain pose
+    VisionConsumer drivetrainConsumer =
+        (pose, ts, stdDevs) -> {
+          drive.addVisionMeasurement(pose, ts, stdDevs);
+        };
+
+    cameraConsumers.put(camera0Name, drivetrainConsumer);
+    cameraConsumers.put(camera1Name, drivetrainConsumer);
+
+    // Turret Camera consumer, outputs the horizontal offset from the current alliances
+    cameraConsumers.put(
+        camera2Name,
+        (pose, ts, stdDevs) -> {
+          int cameraIndex = cameraNameToIndex.get(camera2Name);
+          VisionIOInputsAutoLogged inputs2 = inputs[cameraIndex];
+          int[] seenTags = inputs2.tagIds;
+
+          turretSeesHubTag = false;
+          for (int hubTagId : AllianceFlipUtil.apply(FieldConstants.hubTagIds)) {
+            if (IntStream.of(seenTags).anyMatch(t -> t == hubTagId)) {
+              turretSeesHubTag = true;
+              if (inputs2.latestTargetObservation != null) {
+                turretTxDegrees = inputs2.latestTargetObservation.tx().getDegrees();
+              }
+              break;
+            }
+          }
+        });
   }
 
-  public Rotation2d getTargetX(int cameraIndex) {
-    return inputs[cameraIndex].latestTargetObservation.tx();
+  public VisionIOInputsAutoLogged getInputs(int cameraIndex) {
+    return inputs[cameraIndex];
+  }
+
+  public int getCameraIndex(String cameraName) {
+    Integer idx = cameraNameToIndex.get(cameraName);
+    if (idx == null) {
+      throw new IllegalArgumentException("Camera name not found: " + cameraName);
+    }
+    return idx;
+  }
+
+  public double getTurretTxDegrees() {
+    return turretTxDegrees;
+  }
+
+  public boolean getTurretSeesHubTag() {
+    return turretSeesHubTag;
   }
 
   @Override
   public void periodic() {
-    for (int i = 0; i < io.length; i++) {
-      io[i].updateInputs(inputs[i]);
-      Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
-    }
-
     List<Pose3d> allTagPoses = new LinkedList<>();
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
-    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-      disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+    for (int i = 0; i < io.length; i++) {
+      io[i].updateInputs(inputs[i]);
+      String cameraName = io[i].getName();
+      Logger.processInputs("Vision/" + cameraName, inputs[i]);
+      disconnectedAlerts[i].set(!inputs[i].connected);
 
       List<Pose3d> tagPoses = new LinkedList<>();
-      List<Pose3d> robotPoses = new LinkedList<>();
-      List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
-
-      for (int tagId : inputs[cameraIndex].tagIds) {
-        var tagPose = aprilTagLayout.getTagPose(tagId);
-        tagPose.ifPresent(tagPoses::add);
+      for (int tagId : inputs[i].tagIds) {
+        VisionConstants.aprilTagLayout.getTagPose(tagId).ifPresent(tagPoses::add);
       }
 
-      for (var observation : inputs[cameraIndex].poseObservations) {
-        boolean rejectPose =
-            observation.tagCount() == 0
-                || (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity)
-                || Math.abs(observation.pose().getZ()) > maxZError
-                || observation.pose().getX() < 0.0
-                || observation.pose().getX() > aprilTagLayout.getFieldLength()
-                || observation.pose().getY() < 0.0
-                || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+      VisionConsumer consumer = cameraConsumers.get(cameraName);
+      VisionUtil.PoseProcessingResult poseResult =
+          VisionUtil.processPoseObservations(inputs[i], consumer, i);
 
-        robotPoses.add(observation.pose());
-        if (rejectPose) {
-          robotPosesRejected.add(observation.pose());
-        } else {
-          robotPosesAccepted.add(observation.pose());
-        }
+      Translation3d[] lines = VisionUtil.makeTargetLines(inputs[i]);
 
-        if (rejectPose) continue;
-
-        double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = linearStdDevBaseline * stdDevFactor;
-        double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
-        }
-        if (cameraIndex < cameraStdDevFactors.length) {
-          linearStdDev *= cameraStdDevFactors[cameraIndex];
-          angularStdDev *= cameraStdDevFactors[cameraIndex];
-        }
-
-        consumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-      }
-
-      Translation3d[] lines = new Translation3d[inputs[cameraIndex].tagIds.length * 2];
-      int idx = 0;
-      Pose3d robotPose3d =
-          inputs[cameraIndex].poseObservations.length > 0
-              ? inputs[cameraIndex].poseObservations[0].pose()
-              : new Pose3d();
-      for (int tagId : inputs[cameraIndex].tagIds) {
-        var tagPoseOpt = aprilTagLayout.getTagPose(tagId);
-        if (tagPoseOpt.isPresent()) {
-          Pose3d tagPose3d = tagPoseOpt.get();
-          lines[idx++] = robotPose3d.getTranslation();
-          lines[idx++] = tagPose3d.getTranslation();
-        }
-      }
-
+      Logger.recordOutput("Vision/" + cameraName + "/TagPoses", tagPoses.toArray(new Pose3d[0]));
       Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[0]));
+          "Vision/" + cameraName + "/RobotPoses", poseResult.all.toArray(new Pose3d[0]));
       Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[0]));
+          "Vision/" + cameraName + "/RobotPosesAccepted",
+          poseResult.accepted.toArray(new Pose3d[0]));
       Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPosesAccepted",
-          robotPosesAccepted.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPosesRejected",
-          robotPosesRejected.toArray(new Pose3d[0]));
-      Logger.recordOutput("Vision/Camera" + cameraIndex + "/TargetLines3D", lines);
+          "Vision/" + cameraName + "/RobotPosesRejected",
+          poseResult.rejected.toArray(new Pose3d[0]));
+      Logger.recordOutput("Vision/" + cameraName + "/TargetLines3D", lines);
 
       allTagPoses.addAll(tagPoses);
-      allRobotPoses.addAll(robotPoses);
-      allRobotPosesAccepted.addAll(robotPosesAccepted);
-      allRobotPosesRejected.addAll(robotPosesRejected);
+      allRobotPoses.addAll(poseResult.all);
+      allRobotPosesAccepted.addAll(poseResult.accepted);
+      allRobotPosesRejected.addAll(poseResult.rejected);
     }
 
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
@@ -148,10 +148,14 @@ public class Vision extends SubsystemBase {
   }
 
   @FunctionalInterface
-  public static interface VisionConsumer {
-    public void accept(
+  public interface VisionConsumer {
+    void accept(
         Pose2d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
+  }
+
+  public static Vision createPerCameraVision(Drive drive, VisionIO... io) {
+    return new Vision(drive, io);
   }
 }
