@@ -58,9 +58,14 @@ public class RobotContainer {
     return AllianceFlipUtil.apply(FieldConstants.allianceHubPosition);
   }
 
-  @AutoLogOutput(key = "currentAllianceClimbPos")
-  public Pose2d getAllianceClimbPosition() {
-    return AllianceFlipUtil.apply(FieldConstants.allianceClimbPosition);
+  @AutoLogOutput(key = "currentAllianceRightClimbPos")
+  public Pose2d getAllianceRightClimbPosition() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceRightClimbPosition);
+  }
+
+  @AutoLogOutput(key = "currentAllianceLeftClimbPos")
+  public Pose2d getAllianceLeftClimbPosition() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceLeftClimbPosition);
   }
 
   @AutoLogOutput(key = "TurretTx")

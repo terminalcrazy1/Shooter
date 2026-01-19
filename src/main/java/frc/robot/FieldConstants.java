@@ -42,9 +42,14 @@ public class FieldConstants {
           fieldWidth / 2.0,
           Rotation2d.fromDegrees(180)); // Towards origin
 
-  public static final Pose2d allianceClimbPosition =
+  public static final Pose2d allianceRightClimbPosition =
       new Pose2d(
-          Units.inchesToMeters(41.56),
-          Units.inchesToMeters(147.47),
+          Units.inchesToMeters(44.88),
+          Units.inchesToMeters(115.08),
           Rotation2d.fromDegrees(0)); // Away from origin
+  public static final Pose2d allianceLeftClimbPosition =
+      new Pose2d(
+          Units.inchesToMeters(38.62),
+          Units.inchesToMeters(180.75),
+          Rotation2d.fromDegrees(180)); // Away from origin
 }
