@@ -10,6 +10,7 @@ public interface PivotIO {
     public double velocityRadsPerSec = 0.0;
     public double appliedVoltage = 0.0;
     public double supplyCurrentAmps = 0.0;
+    public double statorCurrentAmps = 0.0;
     public double torqueCurrent = 0.0;
     public boolean connected = false;
   }

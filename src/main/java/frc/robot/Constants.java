@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import java.util.Optional;
 
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
@@ -28,19 +29,28 @@ public final class Constants {
     REPLAY
   }
 
-  public record ModeGains(double kV, double kA, double kS, double kG, double kP, double kD) {}
+  public record ControlSystemConstants(
+      double kV,
+      double kA,
+      double kS,
+      double kG,
+      double kP,
+      double kD,
+      Optional<Double> maxVelocity,
+      Optional<Double> maxAcceleration) {}
 
-  public static class ControlSystemGains {
-    public static final ModeGains EMPTY_GAINS = new ModeGains(0, 0, 0, 0, 0, 0);
-    ModeGains rModeGains;
-    ModeGains sModeGains;
+  public static class ControlSystem {
+    public static final ControlSystemConstants EMPTY_GAINS =
+        new ControlSystemConstants(0, 0, 0, 0, 0, 0, Optional.empty(), Optional.empty());
+    private final ControlSystemConstants rModeGains;
+    private final ControlSystemConstants sModeGains;
 
-    public ControlSystemGains(ModeGains realGains, ModeGains simGains) {
+    public ControlSystem(ControlSystemConstants realGains, ControlSystemConstants simGains) {
       rModeGains = realGains;
       sModeGains = simGains;
     }
 
-    public ModeGains getGains() {
+    public ControlSystemConstants getConstants() {
       switch (currentMode) {
         case REAL:
           return rModeGains;

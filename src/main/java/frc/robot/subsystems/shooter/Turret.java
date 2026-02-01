@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ModeGains;
+import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.subsystems.shooter.ShooterConstants.TurretHeader;
 import frc.robot.subsystems.shooter.ShooterConstants.TurretHood;
 import frc.robot.util.LoggedTunableNumber;
@@ -20,7 +20,7 @@ public class Turret extends SubsystemBase {
   private final PivotIOInputsAutoLogged turretHeaderIOInputs = new PivotIOInputsAutoLogged();
   private final PivotIOInputsAutoLogged turretHoodIOInputs = new PivotIOInputsAutoLogged();
 
-  private final ModeGains turretHeaderGains = TurretHeader.getGains();
+  private final ControlSystemConstants turretHeaderGains = TurretHeader.getGains();
   private final LoggedTunableNumber turretHeaderKs =
       new LoggedTunableNumber("Shooter/TurretHeader/kS", turretHeaderGains.kS());
   private final LoggedTunableNumber turretHeaderKv =
@@ -33,10 +33,11 @@ public class Turret extends SubsystemBase {
       new LoggedTunableNumber("Shooter/TurretHeader/kD", turretHeaderGains.kD());
 
   private final LoggedTunableNumber turretHeaderMaxVelocity =
-      new LoggedTunableNumber("Shooter/TurretHeader/MaxVelocity", TurretHeader.MAX_VELOCITY);
+      new LoggedTunableNumber(
+          "Shooter/TurretHeader/MaxVelocity", turretHeaderGains.maxVelocity().get());
   private final LoggedTunableNumber turretHeaderMaxAcceleration =
       new LoggedTunableNumber(
-          "Shooter/TurretHeader/MaxAcceleration", TurretHeader.MAX_ACCELERATION);
+          "Shooter/TurretHeader/MaxAcceleration", turretHeaderGains.maxAcceleration().get());
 
   private final LoggedTunableNumber turretHoodKs =
       new LoggedTunableNumber("Shooter/TurretHood/kS", TurretHood.kS);
