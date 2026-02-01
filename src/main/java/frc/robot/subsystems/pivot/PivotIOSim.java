@@ -13,6 +13,7 @@ public class PivotIOSim implements PivotIO {
   private double appliedVolts = 0.0;
   private double targetAngleRads = 0.0;
   private boolean voltageOverridesTarget = false;
+  private double extraOmegaRadPerSec = 0.0;
 
   private final DCMotorSim motorSim;
 
@@ -46,6 +47,12 @@ public class PivotIOSim implements PivotIO {
   }
 
   @Override
+  public void setPositionWithExtraOmega(double angleRads, double omegaRadPerSec) {
+    setPosition(angleRads);
+    this.extraOmegaRadPerSec = omegaRadPerSec;
+  }
+
+  @Override
   public void stop() {
     this.appliedVolts = 0.0;
   }
@@ -56,7 +63,8 @@ public class PivotIOSim implements PivotIO {
       double angRad = motorSim.getAngularPositionRad();
 
       double pidOutput = this.pidController.calculate(angRad, this.targetAngleRads);
-      double feedforwardOutput = this.feedforwardController.calculate(pidOutput);
+      double feedforwardOutput =
+          this.feedforwardController.calculate(pidOutput + extraOmegaRadPerSec);
 
       this.setClampedVolts(pidOutput + feedforwardOutput);
     }

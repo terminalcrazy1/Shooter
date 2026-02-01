@@ -19,6 +19,8 @@ public interface PivotIO {
 
   public default void setPosition(double angleRads) {}
 
+  public default void setPositionWithExtraOmega(double angleRads, double omegaRadPerSec) {}
+
   public default void stop() {}
 
   public default void updateInputs(PivotIOInputsAutoLogged inputs) {}

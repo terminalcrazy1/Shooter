@@ -30,7 +30,7 @@ public final class ShooterConstants {
         new ControlSystem(
             ControlSystem.EMPTY_GAINS,
             new ControlSystemConstants(
-                4.44, 0.05, 0, 0, 40, 0, Optional.of(20.0), Optional.of(40.0)));
+                1.0, 0.05, 0, 0, 20, 0.5, Optional.of(60.0), Optional.of(100.0)));
 
     public static ControlSystemConstants getGains() {
       return GAINS.getConstants();

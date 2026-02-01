@@ -198,7 +198,8 @@ public class RobotContainer {
                       new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
 
                   return pointToHubRotation.minus(driveHeading).getMeasure();
-                }));
+                },
+                () -> drive.getAngularVelocityRadPerSec()));
   }
 
   /**

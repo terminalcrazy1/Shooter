@@ -38,7 +38,8 @@ public class Turret extends Pivot {
     super("Shooter/Turret", pivotIO);
   }
 
-  public Command lockOntoTarget(Supplier<Angle> relativeAngleSupplier) {
+  public Command lockOntoTarget(
+      Supplier<Angle> relativeAngleSupplier, Supplier<Double> driveOmegaRadPerSecSupplier) {
     return this.runEnd(
         () -> {
           double relativeAngleRads = relativeAngleSupplier.get().in(Radians);
@@ -71,7 +72,7 @@ public class Turret extends Pivot {
           Logger.recordOutput("Turret/NegativeTarget", negativeTargetAngleRads);
           Logger.recordOutput("Turret/AbsoluteTargetAngle", absoluteAngleRads);
 
-          this.io.setPosition(absoluteAngleRads);
+          this.io.setPositionWithExtraOmega(absoluteAngleRads, -driveOmegaRadPerSecSupplier.get());
         },
         () -> {
           this.io.stop();

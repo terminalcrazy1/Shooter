@@ -92,6 +92,16 @@ public class PivotIOTalonFX implements PivotIO {
   }
 
   @Override
+  public void setPositionWithExtraOmega(double angleRads, double omegaRadPerSec) {
+    double omegaRPS = omegaRadPerSec / (2 * Math.PI);
+
+    motor.setControl(
+        positionRequest
+            .withPosition(Radians.of(omegaRadPerSec))
+            .withFeedForward(motorConfig.Slot0.kV * omegaRPS));
+  }
+
+  @Override
   public void stop() {
     motor.setControl(neutralRequest);
   }
