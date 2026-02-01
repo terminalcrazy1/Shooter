@@ -38,6 +38,8 @@ public final class ShooterConstants {
 
     public static final double MOI = 0.0648478785;
     public static final double GEAR_RATIO = 1 / 52.0;
+    public static final double MIN_ANGLE_RADS = -200 * (Math.PI / 180);
+    public static final double MAX_ANGLE_RADS = 200 * (Math.PI / 180);
   }
 
   public static final class TurretHood {

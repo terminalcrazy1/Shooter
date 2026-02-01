@@ -10,6 +10,7 @@ import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.shooter.ShooterConstants.TurretHeader;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends Pivot {
   private final ControlSystemConstants turretHeaderGains = TurretHeader.getGains();
@@ -31,6 +32,8 @@ public class Turret extends Pivot {
       new LoggedTunableNumber(
           "Shooter/TurretHeader/MaxAcceleration", turretHeaderGains.maxAcceleration().get());
 
+  private final double FULL_CIRCLE_RADS = Math.PI * 2;
+
   public Turret(PivotIO pivotIO) {
     super("Shooter/Turret", pivotIO);
   }
@@ -38,11 +41,37 @@ public class Turret extends Pivot {
   public Command lockOntoTarget(Supplier<Angle> relativeAngleSupplier) {
     return this.runEnd(
         () -> {
-          Angle relativeAngle = relativeAngleSupplier.get();
+          double relativeAngleRads = relativeAngleSupplier.get().in(Radians);
+          Logger.recordOutput("Turret/RelativeAngleOffset", relativeAngleRads);
 
-          // Calculate the nearest absolute angle
+          // Calculate the nearest plausible absolute angle
+          double positiveTargetAngleRads =
+              (relativeAngleRads >= 0) ? relativeAngleRads : FULL_CIRCLE_RADS + relativeAngleRads;
+          double negativeTargetAngleRads =
+              (relativeAngleRads < 0) ? relativeAngleRads : -FULL_CIRCLE_RADS + relativeAngleRads;
 
-          this.io.setPosition(relativeAngle.in(Radians));
+          double absoluteAngleRads;
+
+          if (positiveTargetAngleRads > TurretHeader.MAX_ANGLE_RADS) {
+            absoluteAngleRads = negativeTargetAngleRads;
+          } else if (negativeTargetAngleRads < TurretHeader.MIN_ANGLE_RADS) {
+            absoluteAngleRads = positiveTargetAngleRads;
+          } else {
+            double errorFromPositiveAngle =
+                Math.abs(positiveTargetAngleRads - inputsAutoLogged.positionRads);
+            double errorFromNegativeAngle =
+                Math.abs(negativeTargetAngleRads - inputsAutoLogged.positionRads);
+            absoluteAngleRads =
+                (errorFromPositiveAngle < errorFromNegativeAngle)
+                    ? positiveTargetAngleRads
+                    : negativeTargetAngleRads;
+          }
+
+          Logger.recordOutput("Turret/PositiveTarget", positiveTargetAngleRads);
+          Logger.recordOutput("Turret/NegativeTarget", negativeTargetAngleRads);
+          Logger.recordOutput("Turret/AbsoluteTargetAngle", absoluteAngleRads);
+
+          this.io.setPosition(absoluteAngleRads);
         },
         () -> {
           this.io.stop();
