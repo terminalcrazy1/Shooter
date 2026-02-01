@@ -2,8 +2,6 @@ package frc.robot.subsystems.pivot;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.subsystems.shooter.PivotIOInputsAutoLogged;
-
 public interface PivotIO {
   @AutoLog
   // velocity and position are measured in mechanism units not motor units

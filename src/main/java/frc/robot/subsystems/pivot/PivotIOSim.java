@@ -8,7 +8,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.ControlSystemConstants;
-import frc.robot.subsystems.shooter.PivotIOInputsAutoLogged;
 
 public class PivotIOSim implements PivotIO {
   private double appliedVolts = 0.0;
@@ -22,9 +21,11 @@ public class PivotIOSim implements PivotIO {
       new ProfiledPIDController(0, 0, 0, new Constraints(0.0, 0.0));
 
   public PivotIOSim(DCMotor motor, ControlSystemConstants constants) {
-    this.motorSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(constants.kV(), constants.kA()), motor);
+    this.motorSim =
+        new DCMotorSim(LinearSystemId.createDCMotorSystem(constants.kV(), constants.kA()), motor);
 
-    setControlConstants(constants.kS(), constants.kV(), constants.kA(), constants.kP(), constants.kD());
+    setControlConstants(
+        constants.kS(), constants.kV(), constants.kA(), constants.kP(), constants.kD());
     setMotionProfile(constants.maxVelocity().get(), constants.maxAcceleration().get());
   }
 

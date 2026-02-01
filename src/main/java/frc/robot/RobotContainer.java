@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Radians;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -91,7 +89,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        turret = new Turret(new PivotIO() {}, new PivotIO() {});
+        turret = new Turret(new PivotIO() {});
         break;
 
       case SIM:
@@ -107,11 +105,7 @@ public class RobotContainer {
 
         turret =
             new Turret(
-                new PivotIOSim(
-                    DCMotor.getKrakenX60(1),
-                    ShooterConstants.TurretHeader.getGains().kV(),
-                    ShooterConstants.TurretHeader.getGains().kA()),
-                new PivotIO() {});
+                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.TurretHeader.getGains()));
         break;
 
       default:
@@ -124,7 +118,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        turret = new Turret(new PivotIO() {}, new PivotIO() {});
+        turret = new Turret(new PivotIO() {});
         break;
     }
 
@@ -204,9 +198,6 @@ public class RobotContainer {
                       new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
 
                   return pointToHubRotation.minus(driveHeading).getMeasure();
-                },
-                () -> {
-                  return Radians.zero(); // Placeholder
                 }));
   }
 

@@ -4,32 +4,30 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ControlSystemConstants;
-import frc.robot.subsystems.shooter.PivotIOInputsAutoLogged;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
   public final TalonFX motor;
   private final TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
-  private final VoltageOut voltageRequest = new VoltageOut(0.0).withUpdateFreqHz(50.0).withEnableFOC(true);
-  private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0).withUpdateFreqHz(50.0).withEnableFOC(true);
+  private final VoltageOut voltageRequest =
+      new VoltageOut(0.0).withUpdateFreqHz(50.0).withEnableFOC(true);
+  private final MotionMagicVoltage positionRequest =
+      new MotionMagicVoltage(0.0).withUpdateFreqHz(50.0).withEnableFOC(true);
   private final NeutralOut neutralRequest = new NeutralOut();
 
   private final StatusSignal<Angle> positionSignal;
@@ -100,13 +98,15 @@ public class PivotIOTalonFX implements PivotIO {
 
   @Override
   public void updateInputs(PivotIOInputsAutoLogged inputs) {
-    inputs.connected = connectedDebouncer.calculate(BaseStatusSignal.refreshAll(
-      positionSignal,
-      velocitySignal,
-      voltageSignal,
-      supplyCurrentSignal,
-      statorCurrentSignal
-    ).isOK());
+    inputs.connected =
+        connectedDebouncer.calculate(
+            BaseStatusSignal.refreshAll(
+                    positionSignal,
+                    velocitySignal,
+                    voltageSignal,
+                    supplyCurrentSignal,
+                    statorCurrentSignal)
+                .isOK());
 
     inputs.positionRads = positionSignal.getValue().in(Radians);
     inputs.velocityRadsPerSec = velocitySignal.getValue().in(RadiansPerSecond);

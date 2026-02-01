@@ -147,7 +147,9 @@ public class Superstructure extends SubsystemBase {
                             .getPose()
                             .getTranslation()
                             .getDistance(hubPoseSupplier.get().getTranslation()),
-                        drive.getRotation().plus(turret.getPivotRotation()))),
+                        drive
+                            .getRotation()
+                            .plus(Rotation2d.fromRadians(turret.getOrientationRads())))),
             Rotation2d.kZero));
   }
 }
