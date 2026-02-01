@@ -129,7 +129,8 @@ public class VisionIOPhotonVisionSim implements VisionIO {
       }
     }
 
-    inputs.poseObservations = poseObservations.toArray(new PoseObservation[poseObservations.size()]);
+    inputs.poseObservations =
+        poseObservations.toArray(new PoseObservation[poseObservations.size()]);
 
     inputs.tagIds = new int[seenTagIds.size()];
     int idx = 0;
