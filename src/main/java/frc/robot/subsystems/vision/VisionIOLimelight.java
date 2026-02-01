@@ -41,7 +41,7 @@ public class VisionIOLimelight implements VisionIO {
    *
    * @param name The configured name of the Limelight.
    * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
-   * @param isLL4 
+   * @param isLL4
    */
   public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier, boolean isLL4) {
     var table = NetworkTableInstance.getDefault().getTable(name);
@@ -105,12 +105,14 @@ public class VisionIOLimelight implements VisionIO {
 
       Pose3d pose = parsePose(rawSample.value);
 
-      //Use ll4 internal imu for greated mt2 accuracy
+      // Use ll4 internal imu for greated mt2 accuracy
       if (isLL4 && imuSeeded) {
         double imuYawRadians = Units.degreesToRadians(pose.getRotation().getZ());
-        pose = new Pose3d(
-            pose.getTranslation(),
-            new Rotation3d(pose.getRotation().getX(), pose.getRotation().getY(), imuYawRadians));
+        pose =
+            new Pose3d(
+                pose.getTranslation(),
+                new Rotation3d(
+                    pose.getRotation().getX(), pose.getRotation().getY(), imuYawRadians));
       }
 
       poseObservations.add(

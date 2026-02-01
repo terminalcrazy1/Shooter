@@ -102,12 +102,15 @@ public class RobotContainer {
 
         intake = new Intake(new IntakeIOTalonFx(12, "rio"));
 
-        vision = Vision.createPerCameraVision(
-    drive,
-    new VisionIOLimelight(VisionConstants.camera0Name, () -> drive.getPose().getRotation(),true),
-    new VisionIOLimelight(VisionConstants.camera1Name, () -> drive.getPose().getRotation(),true),
-    new VisionIOLimelight(VisionConstants.camera2Name, () -> drive.getPose().getRotation(),false)
-);
+        vision =
+            Vision.createPerCameraVision(
+                drive,
+                new VisionIOLimelight(
+                    VisionConstants.camera0Name, () -> drive.getPose().getRotation(), true),
+                new VisionIOLimelight(
+                    VisionConstants.camera1Name, () -> drive.getPose().getRotation(), true),
+                new VisionIOLimelight(
+                    VisionConstants.camera2Name, () -> drive.getPose().getRotation(), false));
         break;
 
       case SIM:
@@ -150,12 +153,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         intake = new Intake(new IntakeIO() {});
-        vision = Vision.createPerCameraVision(
-    drive,
-    new VisionIO() {}, 
-    new VisionIO() {},
-    new VisionIO() {}
-);
+        vision =
+            Vision.createPerCameraVision(
+                drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
 
         break;
     }
