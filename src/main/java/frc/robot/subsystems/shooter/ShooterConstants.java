@@ -23,7 +23,7 @@ public final class ShooterConstants {
     public static final double WHEEL_RADIUS_METERS = 0.1;
   }
 
-  public static final class TurretHeader {
+  public static final class Turret {
     public static final int CAN_ID = 2;
 
     private static final ControlSystem GAINS =
@@ -42,18 +42,19 @@ public final class ShooterConstants {
     public static final double MAX_ANGLE_RADS = 200 * (Math.PI / 180);
   }
 
-  public static final class TurretHood {
+  public static final class Hood {
     public static final int CAN_ID = 3;
 
-    public static final double kV = 0.1;
-    public static final double kA = 0.1;
-    public static final double kS = 0;
+    private static final ControlSystem GAINS =
+        new ControlSystem(
+            ControlSystem.EMPTY_GAINS,
+            new ControlSystemConstants(
+                4.44, 0.1, 0.0, 0.0, 1.0, 0.0, Optional.of(1.0), Optional.of(1.0)));
 
-    public static final double kP = 0;
-    public static final double kD = 0;
+    public static ControlSystemConstants getGains() {
+      return GAINS.getConstants();
+    }
 
-    public static final double MAX_VELOCITY = 1.0;
-    public static final double MAX_ACCELERATION = 1.0;
     public static final double MOI = 0.01;
     public static final double GEAR_RATIO = 1.0;
   }

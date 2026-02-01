@@ -7,30 +7,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIO;
-import frc.robot.subsystems.shooter.ShooterConstants.TurretHeader;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends Pivot {
-  private final ControlSystemConstants turretHeaderGains = TurretHeader.getGains();
-  private final LoggedTunableNumber turretHeaderKs =
-      new LoggedTunableNumber("Shooter/TurretHeader/kS", turretHeaderGains.kS());
-  private final LoggedTunableNumber turretHeaderKv =
-      new LoggedTunableNumber("Shooter/TurretHeader/kV", turretHeaderGains.kV());
-  private final LoggedTunableNumber turretHeaderKa =
-      new LoggedTunableNumber("Shooter/TurretHeader/kA", turretHeaderGains.kA());
-  private final LoggedTunableNumber turretHeaderKp =
-      new LoggedTunableNumber("Shooter/TurretHeader/kP", turretHeaderGains.kP());
-  private final LoggedTunableNumber turretHeaderKd =
-      new LoggedTunableNumber("Shooter/TurretHeader/kD", turretHeaderGains.kD());
+  private final ControlSystemConstants gains = ShooterConstants.Turret.getGains();
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/Turret/kS", gains.kS());
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/Turret/kV", gains.kV());
+  private final LoggedTunableNumber kA = new LoggedTunableNumber("Shooter/Turret/kA", gains.kA());
+  private final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/Turret/kP", gains.kP());
+  private final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/Turret/kD", gains.kD());
 
-  private final LoggedTunableNumber turretHeaderMaxVelocity =
-      new LoggedTunableNumber(
-          "Shooter/TurretHeader/MaxVelocity", turretHeaderGains.maxVelocity().get());
-  private final LoggedTunableNumber turretHeaderMaxAcceleration =
-      new LoggedTunableNumber(
-          "Shooter/TurretHeader/MaxAcceleration", turretHeaderGains.maxAcceleration().get());
+  private final LoggedTunableNumber maxVelocity =
+      new LoggedTunableNumber("Shooter/Turret/MaxVelocity", gains.maxVelocity().get());
+  private final LoggedTunableNumber maxAcceleration =
+      new LoggedTunableNumber("Shooter/Turret/MaxAcceleration", gains.maxAcceleration().get());
 
   private final double FULL_CIRCLE_RADS = Math.PI * 2;
 
@@ -53,9 +45,9 @@ public class Turret extends Pivot {
 
           double absoluteAngleRads;
 
-          if (positiveTargetAngleRads > TurretHeader.MAX_ANGLE_RADS) {
+          if (positiveTargetAngleRads > ShooterConstants.Turret.MAX_ANGLE_RADS) {
             absoluteAngleRads = negativeTargetAngleRads;
-          } else if (negativeTargetAngleRads < TurretHeader.MIN_ANGLE_RADS) {
+          } else if (negativeTargetAngleRads < ShooterConstants.Turret.MIN_ANGLE_RADS) {
             absoluteAngleRads = positiveTargetAngleRads;
           } else {
             double errorFromPositiveAngle =
@@ -88,16 +80,16 @@ public class Turret extends Pivot {
         (constants) ->
             this.io.setControlConstants(
                 constants[0], constants[1], constants[2], constants[3], constants[4]),
-        turretHeaderKs,
-        turretHeaderKv,
-        turretHeaderKa,
-        turretHeaderKp,
-        turretHeaderKd);
+        kS,
+        kV,
+        kA,
+        kP,
+        kD);
     LoggedTunableNumber.ifChanged(
         id,
         (constants) -> this.io.setMotionProfile(constants[0], constants[1]),
-        turretHeaderMaxVelocity,
-        turretHeaderMaxAcceleration);
+        maxVelocity,
+        maxAcceleration);
 
     super.periodic();
   }

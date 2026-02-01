@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +31,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.shooter.Hood;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Turret;
 import frc.robot.util.AllianceFlipUtil;
@@ -44,7 +47,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+
   private final Turret turret;
+  private final Hood hood;
+
   private final Superstructure superstructure;
 
   // Controller
@@ -90,6 +96,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         turret = new Turret(new PivotIO() {});
+        hood = new Hood(new PivotIO() {});
         break;
 
       case SIM:
@@ -104,8 +111,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         turret =
-            new Turret(
-                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.TurretHeader.getGains()));
+            new Turret(new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.getGains()));
+        hood = new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getGains()));
         break;
 
       default:
@@ -119,6 +126,7 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         turret = new Turret(new PivotIO() {});
+        hood = new Hood(new PivotIO() {});
         break;
     }
 
@@ -199,7 +207,13 @@ public class RobotContainer {
 
                   return pointToHubRotation.minus(driveHeading).getMeasure();
                 },
-                () -> drive.getAngularVelocityRadPerSec()));
+                () -> drive.getAngularVelocityRadPerSec()))
+        .whileTrue(
+            hood.trackTarget(
+                () ->
+                    Meters.of(
+                        getAllianceHubTranslation()
+                            .getDistance(drive.getPose().getTranslation()))));
   }
 
   /**
