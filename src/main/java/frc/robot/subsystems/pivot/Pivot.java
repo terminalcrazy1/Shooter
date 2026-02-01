@@ -26,8 +26,8 @@ public class Pivot extends SubsystemBase {
     return this.runOnce(() -> io.setPosition(target.in(Radians)));
   }
 
-  public double getOrientationRads() {
-    return inputsAutoLogged.positionRads;
+  public Angle getOrientation() {
+    return Radians.of(inputsAutoLogged.positionRads);
   }
 
   @Override

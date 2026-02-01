@@ -1,17 +1,17 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.Constants.ControlSystemContext;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.Supplier;
 
 public class Hood extends Pivot {
-  private final ControlSystemConstants gains = ShooterConstants.Hood.getGains();
+  private final ControlSystemContext gains = ShooterConstants.Hood.getGains();
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/Hood/kS", gains.kS());
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/Hood/kV", gains.kV());
   private final LoggedTunableNumber kA = new LoggedTunableNumber("Shooter/Hood/kA", gains.kA());
@@ -27,13 +27,10 @@ public class Hood extends Pivot {
     super("Shooter/Hood", io);
   }
 
-  public Command trackTarget(Supplier<Distance> distanceSupplier) {
+  public Command trackTarget(Supplier<Angle> angleSupplier) {
     return runEnd(
         () -> {
-          double targetAngleRads =
-              distanceSupplier.get().in(Meters); // Have an actual way to calculate the angle later
-
-          io.setPosition(targetAngleRads);
+          io.setPosition(angleSupplier.get().in(Radians));
         },
         () -> io.stop());
   }

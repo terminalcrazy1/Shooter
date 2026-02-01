@@ -29,7 +29,7 @@ public final class Constants {
     REPLAY
   }
 
-  public record ControlSystemConstants(
+  public record ControlSystemContext(
       double kV,
       double kA,
       double kS,
@@ -39,18 +39,18 @@ public final class Constants {
       Optional<Double> maxVelocity,
       Optional<Double> maxAcceleration) {}
 
-  public static class ControlSystem {
-    public static final ControlSystemConstants EMPTY_GAINS =
-        new ControlSystemConstants(0, 0, 0, 0, 0, 0, Optional.empty(), Optional.empty());
-    private final ControlSystemConstants rModeGains;
-    private final ControlSystemConstants sModeGains;
+  public static class ControlSystemConstants {
+    public static final ControlSystemContext EMPTY_GAINS =
+        new ControlSystemContext(0, 0, 0, 0, 0, 0, Optional.empty(), Optional.empty());
+    private final ControlSystemContext rModeGains;
+    private final ControlSystemContext sModeGains;
 
-    public ControlSystem(ControlSystemConstants realGains, ControlSystemConstants simGains) {
+    public ControlSystemConstants(ControlSystemContext realGains, ControlSystemContext simGains) {
       rModeGains = realGains;
       sModeGains = simGains;
     }
 
-    public ControlSystemConstants getConstants() {
+    public ControlSystemContext getConstants() {
       switch (currentMode) {
         case REAL:
           return rModeGains;

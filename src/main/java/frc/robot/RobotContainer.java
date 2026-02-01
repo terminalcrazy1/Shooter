@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +31,8 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.shooter.Hood;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Turret;
@@ -95,8 +97,24 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        turret = new Turret(new PivotIO() {});
-        hood = new Hood(new PivotIO() {});
+        turret =
+            new Turret(
+                new PivotIOTalonFX(
+                    ShooterConstants.Turret.CAN_ID,
+                    ShooterConstants.Turret.CANBUS,
+                    new PivotTalonFXConstants(
+                        ShooterConstants.Turret.getGains(),
+                        false,
+                        ShooterConstants.Turret.GEAR_RATIO)));
+        hood =
+            new Hood(
+                new PivotIOTalonFX(
+                    ShooterConstants.Hood.CAN_ID,
+                    ShooterConstants.Hood.CANBUS,
+                    new PivotTalonFXConstants(
+                        ShooterConstants.Hood.getGains(),
+                        false,
+                        ShooterConstants.Hood.GEAR_RATIO)));
         break;
 
       case SIM:
@@ -184,7 +202,7 @@ public class RobotContainer {
 
     // Reset gyro to 0° when B button is pressed
     controller
-        .b()
+        .start()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -211,7 +229,7 @@ public class RobotContainer {
         .whileTrue(
             hood.trackTarget(
                 () ->
-                    Meters.of(
+                    Radians.of(
                         getAllianceHubTranslation()
                             .getDistance(drive.getPose().getTranslation()))));
   }

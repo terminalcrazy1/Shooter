@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.Constants.ControlSystemContext;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.util.LoggedTunableNumber;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends Pivot {
-  private final ControlSystemConstants gains = ShooterConstants.Turret.getGains();
+  private final ControlSystemContext gains = ShooterConstants.Turret.getGains();
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/Turret/kS", gains.kS());
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/Turret/kV", gains.kV());
   private final LoggedTunableNumber kA = new LoggedTunableNumber("Shooter/Turret/kA", gains.kA());

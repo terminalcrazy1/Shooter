@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.Constants.ControlSystemContext;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
@@ -39,15 +39,12 @@ public class PivotIOTalonFX implements PivotIO {
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
   public record PivotTalonFXConstants(
-      ControlSystemConstants controlSystemConstants,
-      boolean clockwisePositive,
-      double gearRatio,
-      double currentLimit) {}
+      ControlSystemContext controlSystemConstants, boolean clockwisePositive, double gearRatio) {}
 
   public PivotIOTalonFX(int canId, String canBus, PivotTalonFXConstants constants) {
     motor = new TalonFX(canId, canBus);
 
-    ControlSystemConstants controlSystemConstants = constants.controlSystemConstants();
+    ControlSystemContext controlSystemConstants = constants.controlSystemConstants();
 
     motorConfig.MotorOutput.Inverted =
         constants.clockwisePositive
@@ -55,9 +52,6 @@ public class PivotIOTalonFX implements PivotIO {
             : InvertedValue.CounterClockwise_Positive;
 
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    motorConfig.CurrentLimits.SupplyCurrentLimit = constants.currentLimit();
-    motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio;
 

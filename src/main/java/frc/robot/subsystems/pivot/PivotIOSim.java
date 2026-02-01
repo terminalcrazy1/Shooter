@@ -7,7 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.Constants.ControlSystemContext;
 
 public class PivotIOSim implements PivotIO {
   private double appliedVolts = 0.0;
@@ -21,7 +21,7 @@ public class PivotIOSim implements PivotIO {
   private final ProfiledPIDController pidController =
       new ProfiledPIDController(0, 0, 0, new Constraints(0.0, 0.0));
 
-  public PivotIOSim(DCMotor motor, ControlSystemConstants constants) {
+  public PivotIOSim(DCMotor motor, ControlSystemContext constants) {
     this.motorSim =
         new DCMotorSim(LinearSystemId.createDCMotorSystem(constants.kV(), constants.kA()), motor);
 
