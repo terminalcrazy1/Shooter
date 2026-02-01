@@ -126,7 +126,7 @@ public class VisionIOLimelight implements VisionIO {
     }
 
     // Save pose observations to inputs object
-    inputs.poseObservations = poseObservations.toArray(new PoseObservation[0]);
+    inputs.poseObservations = poseObservations.toArray(new PoseObservation[poseObservations.size()]);
 
     // Save tag IDs to inputs object
     inputs.tagIds = tagIds.stream().mapToInt(Integer::intValue).toArray();

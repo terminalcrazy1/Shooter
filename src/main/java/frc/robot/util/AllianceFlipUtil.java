@@ -49,8 +49,8 @@ public class AllianceFlipUtil {
     return new Pose3d(apply(pose.getTranslation()), apply(pose.getRotation()));
   }
 
-  public static List<Integer> apply(List<Integer> ids) {
-    return shouldFlip() ? ids.stream().map(id -> id - 16).toList() : ids;
+  public static List<Integer> apply(List<Integer> aprilTagIds) {
+    return shouldFlip() ? aprilTagIds.stream().map(id -> id - 16).toList() : aprilTagIds;
   }
 
   public static boolean shouldFlip() {

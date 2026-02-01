@@ -39,7 +39,7 @@ public interface VisionIO {
     PHOTONVISION
   }
 
-  default String getName() {
+ public default String getName() {
     return "";
   }
 

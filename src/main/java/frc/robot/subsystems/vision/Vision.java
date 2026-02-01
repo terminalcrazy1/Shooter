@@ -28,7 +28,6 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final Map<String, VisionConsumer> cameraConsumers;
   private final Map<String, Integer> cameraNameToIndex = new HashMap<>();
-  private final Drive drive;
 
   private double turretTxDegrees = 0.0;
   private int turretSeenTagId = -1;
@@ -36,9 +35,8 @@ public class Vision extends SubsystemBase {
   private int turretTagFrames = 0;
   private static final int TURRET_DEBOUNCE_FRAMES = 3;
 
-  public Vision(Drive drivePose, VisionIO... io) {
+  public Vision(Drive drive, VisionIO... io) {
     this.io = io;
-    this.drive = drivePose;
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     this.disconnectedAlerts = new Alert[io.length];
     this.cameraConsumers = new HashMap<>();

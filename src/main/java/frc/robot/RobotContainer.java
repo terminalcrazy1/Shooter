@@ -53,20 +53,20 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-  // Log feild element positions
-  @AutoLogOutput(key = "currentAllianceHubPos")
-  public Pose2d getAllianceHubPosition() {
-    return AllianceFlipUtil.apply(FieldConstants.allianceHubPosition);
+  // Log field element positions
+  @AutoLogOutput(key = "currentAllianceHubPose")
+  public Pose2d getAllianceHubPose() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceHubPose);
   }
 
-  @AutoLogOutput(key = "currentAllianceRightClimbPos")
-  public Pose2d getAllianceRightClimbPosition() {
-    return AllianceFlipUtil.apply(FieldConstants.allianceRightClimbPosition);
+  @AutoLogOutput(key = "currentAllianceRightClimbPose")
+  public Pose2d getAllianceRightClimbPose() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceRightClimbPose);
   }
 
-  @AutoLogOutput(key = "currentAllianceLeftClimbPos")
-  public Pose2d getAllianceLeftClimbPosition() {
-    return AllianceFlipUtil.apply(FieldConstants.allianceLeftClimbPosition);
+  @AutoLogOutput(key = "currentAllianceLeftClimbPose")
+  public Pose2d getAllianceLeftClimbPose() {
+    return AllianceFlipUtil.apply(FieldConstants.allianceLeftClimbPose);
   }
 
   @AutoLogOutput(key = "TurretTx")
@@ -219,7 +219,7 @@ public class RobotContainer {
                 () -> controller.getLeftY(),
                 () -> controller.getLeftX(),
                 () ->
-                    getAllianceHubPosition()
+                    getAllianceHubPose()
                         .getTranslation()
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));

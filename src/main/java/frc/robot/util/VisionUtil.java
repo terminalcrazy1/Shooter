@@ -52,11 +52,10 @@ public final class VisionUtil {
       robotPoses.add(observation.pose());
       if (rejectPose) {
         robotPosesRejected.add(observation.pose());
+        continue;
       } else {
         robotPosesAccepted.add(observation.pose());
       }
-
-      if (rejectPose) continue;
 
       double stdDevFactor =
           Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();

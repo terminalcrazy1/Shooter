@@ -21,8 +21,8 @@ import java.util.List;
  */
 public class FieldConstants {
 
-  // Built in apriltag  layout
-  // Default is welded, the feild type used in Ontario district
+  // Built in apriltag layout
+  // Default is welded, the field type used in Ontario district
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -36,18 +36,18 @@ public class FieldConstants {
   public static final List<Integer> hubTagIds =
       Arrays.asList(18, 19, 20, 21, 24, 25, 26, 27); // tags for blue hub
   // Scoring element positions
-  public static final Pose2d allianceHubPosition =
+  public static final Pose2d allianceHubPose =
       new Pose2d(
           Units.inchesToMeters(181.56),
           fieldWidth / 2.0,
           Rotation2d.fromDegrees(180)); // Towards origin
 
-  public static final Pose2d allianceRightClimbPosition =
+  public static final Pose2d allianceRightClimbPose =
       new Pose2d(
           Units.inchesToMeters(44.88),
           Units.inchesToMeters(115.08),
           Rotation2d.fromDegrees(0)); // Away from origin
-  public static final Pose2d allianceLeftClimbPosition =
+  public static final Pose2d allianceLeftClimbPose =
       new Pose2d(
           Units.inchesToMeters(38.62),
           Units.inchesToMeters(180.75),
