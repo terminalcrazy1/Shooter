@@ -104,9 +104,9 @@ public class RobotContainer {
 
         vision = Vision.createPerCameraVision(
     drive,
-    new VisionIOLimelight(VisionConstants.camera0Name, () -> drive.getPose().getRotation()),
-    new VisionIOLimelight(VisionConstants.camera1Name, () -> drive.getPose().getRotation()),
-    new VisionIOLimelight(VisionConstants.camera2Name, () -> drive.getPose().getRotation())
+    new VisionIOLimelight(VisionConstants.camera0Name, () -> drive.getPose().getRotation(),true),
+    new VisionIOLimelight(VisionConstants.camera1Name, () -> drive.getPose().getRotation(),true),
+    new VisionIOLimelight(VisionConstants.camera2Name, () -> drive.getPose().getRotation(),false)
 );
         break;
 
