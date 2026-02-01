@@ -31,6 +31,7 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.AllianceFlipUtil;
@@ -48,8 +49,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Intake intake;
-  // change to final when  realIO is  implemented
-  private Vision vision;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -150,6 +150,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         intake = new Intake(new IntakeIO() {});
+        vision = Vision.createPerCameraVision(
+    drive,
+    new VisionIO() {}, 
+    new VisionIO() {},
+    new VisionIO() {}
+);
 
         break;
     }
