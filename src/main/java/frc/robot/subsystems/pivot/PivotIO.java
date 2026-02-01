@@ -1,6 +1,8 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.pivot;
 
 import org.littletonrobotics.junction.AutoLog;
+
+import frc.robot.subsystems.shooter.PivotIOInputsAutoLogged;
 
 public interface PivotIO {
   @AutoLog

@@ -7,6 +7,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.shooter.ShooterConstants.TurretHeader;
 import frc.robot.subsystems.shooter.ShooterConstants.TurretHood;
 import frc.robot.util.LoggedTunableNumber;

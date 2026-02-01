@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.subsystems.shooter.PivotIOInputsAutoLogged;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
@@ -39,13 +40,13 @@ public class PivotIOTalonFX implements PivotIO {
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-  public record PivotConstants(
+  public record PivotTalonFXConstants(
       ControlSystemConstants controlSystemConstants,
       boolean clockwisePositive,
       double gearRatio,
       double currentLimit) {}
 
-  public PivotIOTalonFX(int canId, String canBus, PivotConstants constants) {
+  public PivotIOTalonFX(int canId, String canBus, PivotTalonFXConstants constants) {
     motor = new TalonFX(canId, canBus);
 
     ControlSystemConstants controlSystemConstants = constants.controlSystemConstants();
