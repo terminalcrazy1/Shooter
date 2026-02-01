@@ -28,14 +28,17 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final Map<String, VisionConsumer> cameraConsumers;
   private final Map<String, Integer> cameraNameToIndex = new HashMap<>();
-  private final Drive drive; // Is passing drive in here a bad idea?
+  private final Drive drive;
 
   private double turretTxDegrees = 0.0;
-  private boolean turretSeesHubTag = false;
+  private int turretSeenTagId = -1;
+  private int turretCandidateTagId = -1;
+  private int turretTagFrames = 0;
+  private static final int TURRET_DEBOUNCE_FRAMES = 3;
 
-  public Vision(Drive drive, VisionIO... io) {
+  public Vision(Drive drivePose, VisionIO... io) {
     this.io = io;
-    this.drive = drive;
+    this.drive = drivePose;
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     this.disconnectedAlerts = new Alert[io.length];
     this.cameraConsumers = new HashMap<>();
@@ -57,7 +60,8 @@ public class Vision extends SubsystemBase {
     cameraConsumers.put(camera0Name, drivetrainConsumer);
     cameraConsumers.put(camera1Name, drivetrainConsumer);
 
-    // Turret Camera consumer, outputs the horizontal offset from the current alliances
+    // Turret Camera consumer, outputs the horizontal offset from the current alliances hub tag
+    // debounced
     cameraConsumers.put(
         camera2Name,
         (pose, ts, stdDevs) -> {
@@ -65,15 +69,26 @@ public class Vision extends SubsystemBase {
           VisionIOInputsAutoLogged inputs2 = inputs[cameraIndex];
           int[] seenTags = inputs2.tagIds;
 
-          turretSeesHubTag = false;
+          double tx = 0.0;
+          int newCandidate = -1;
           for (int hubTagId : AllianceFlipUtil.apply(FieldConstants.hubTagIds)) {
             if (IntStream.of(seenTags).anyMatch(t -> t == hubTagId)) {
-              turretSeesHubTag = true;
+              newCandidate = hubTagId;
               if (inputs2.latestTargetObservation != null) {
-                turretTxDegrees = inputs2.latestTargetObservation.tx().getDegrees();
+                tx = inputs2.latestTargetObservation.tx().getDegrees();
               }
               break;
             }
+          }
+          if (newCandidate == turretCandidateTagId) {
+            turretTagFrames++;
+          } else {
+            turretCandidateTagId = newCandidate;
+            turretTagFrames = 1;
+          }
+          if (turretTagFrames >= TURRET_DEBOUNCE_FRAMES) {
+            turretSeenTagId = turretCandidateTagId;
+            turretTxDegrees = tx;
           }
         });
   }
@@ -94,8 +109,8 @@ public class Vision extends SubsystemBase {
     return turretTxDegrees;
   }
 
-  public boolean getTurretSeesHubTag() {
-    return turretSeesHubTag;
+  public int getTurretSeenTagId() {
+    return turretSeenTagId;
   }
 
   @Override

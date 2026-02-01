@@ -31,6 +31,7 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.AllianceFlipUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -73,9 +74,9 @@ public class RobotContainer {
     return vision != null ? vision.getTurretTxDegrees() : 0.0;
   }
 
-  @AutoLogOutput(key = "TurretSeesHubTag")
-  public boolean getTurretSeesHubTag() {
-    return vision.getTurretSeesHubTag();
+  @AutoLogOutput(key = "TurretCurrentTagID")
+  public int getTurretSeesHubTag() {
+    return vision.getTurretSeenTagId();
   }
 
   // Dashboard inputs
@@ -100,6 +101,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         intake = new Intake(new IntakeIOTalonFx(12, "rio"));
+
+        vision = Vision.createPerCameraVision(
+    drive,
+    new VisionIOLimelight(VisionConstants.camera0Name, () -> drive.getPose().getRotation()),
+    new VisionIOLimelight(VisionConstants.camera1Name, () -> drive.getPose().getRotation()),
+    new VisionIOLimelight(VisionConstants.camera2Name, () -> drive.getPose().getRotation())
+);
         break;
 
       case SIM:
