@@ -7,9 +7,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -27,9 +31,16 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.pivot.PivotIO;
+import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.shooter.Hood;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -46,11 +57,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
   // Subsystems
   private final Drive drive;
   private final Intake intake;
   private final Vision vision;
+
+  private final Turret turret;
+  private final Hood hood;
+
+  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -115,6 +130,25 @@ public class RobotContainer {
                     VisionConstants.camera1Name, () -> drive.getPose().getRotation(), true),
                 new VisionIOLimelight(
                     VisionConstants.camera2Name, () -> drive.getPose().getRotation(), false));
+
+        turret =
+            new Turret(
+                new PivotIOTalonFX(
+                    ShooterConstants.Turret.CAN_ID,
+                    ShooterConstants.Turret.CANBUS,
+                    new PivotTalonFXConstants(
+                        ShooterConstants.Turret.getGains(),
+                        false,
+                        ShooterConstants.Turret.GEAR_RATIO)));
+        hood =
+            new Hood(
+                new PivotIOTalonFX(
+                    ShooterConstants.Hood.CAN_ID,
+                    ShooterConstants.Hood.CANBUS,
+                    new PivotTalonFXConstants(
+                        ShooterConstants.Hood.getGains(),
+                        false,
+                        ShooterConstants.Hood.GEAR_RATIO)));
         break;
 
       case SIM:
@@ -147,6 +181,9 @@ public class RobotContainer {
                     VisionConstants.camera2Name,
                     VisionConstants.robotToCamera2,
                     () -> drive.getPose()));
+        turret =
+            new Turret(new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.getGains()));
+        hood = new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getGains()));
         break;
 
       default:
@@ -164,9 +201,12 @@ public class RobotContainer {
             Vision.createPerCameraVision(
                 drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
 
+        turret = new Turret(new PivotIO() {});
+        hood = new Hood(new PivotIO() {});
         break;
     }
 
+    this.superstructure = new Superstructure(drive, turret, () -> getAllianceHubPose());
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -231,12 +271,9 @@ public class RobotContainer {
                         .minus(drive.getPose().getTranslation())
                         .getAngle()));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
     // Reset gyro to 0° when B button is pressed
     controller
-        .b()
+        .start()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -244,6 +281,29 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            turret.lockOntoTarget(
+                () -> {
+                  Pose2d drivePose = this.drive.getPose();
+                  Rotation2d driveHeading = drivePose.getRotation();
+                  Translation2d driveToHubVector =
+                      getAllianceHubPose().getTranslation().minus(drivePose.getTranslation());
+                  Rotation2d pointToHubRotation =
+                      new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
+
+                  return pointToHubRotation.minus(driveHeading).getMeasure();
+                },
+                () -> drive.getAngularVelocityRadPerSec()))
+        .whileTrue(
+            hood.trackTarget(
+                () ->
+                    Radians.of(
+                        getAllianceHubPose()
+                            .getTranslation()
+                            .getDistance(drive.getPose().getTranslation()))));
   }
 
   /**
