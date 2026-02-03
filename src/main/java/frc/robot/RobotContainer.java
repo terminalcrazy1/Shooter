@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -262,19 +263,11 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> Rotation2d.kZero));
 
-    // 0
-    controller
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                () -> intake.pivot.setTargetAngle(Radians.of(Math.toRadians(0))), intake));
+    // 0 degrees
+    controller.x().onTrue(intake.pivot.setTargetAngle(Degrees.of(0)));
 
-    // 90
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> intake.pivot.setTargetAngle(Radians.of(Math.toRadians(90))), intake));
+    // 90 degrees
+    controller.b().onTrue(intake.pivot.setTargetAngle(Degrees.of(90)));
 
     controller
         .rightTrigger()
