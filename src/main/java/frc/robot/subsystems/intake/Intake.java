@@ -14,11 +14,16 @@ public class Intake extends Rollers {
   private final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0.0);
 
   public final Pivot pivot;
-  private final LoggedTunableNumber pivot_kS = new LoggedTunableNumber("IntakePivot/kS", 0.2);
-  private final LoggedTunableNumber pivot_kV = new LoggedTunableNumber("IntakePivot/kV", 0.01);
-  private final LoggedTunableNumber pivot_kA = new LoggedTunableNumber("IntakePivot/kA", 0.0);
-  private final LoggedTunableNumber pivot_kP = new LoggedTunableNumber("IntakePivot/kP", 5.0);
-  private final LoggedTunableNumber pivot_kD = new LoggedTunableNumber("IntakePivot/kD", 0.0);
+  private final LoggedTunableNumber pivot_kS =
+      new LoggedTunableNumber("IntakePivot/kS", IntakeConstants.Pivot.getGains().kS());
+  private final LoggedTunableNumber pivot_kV =
+      new LoggedTunableNumber("IntakePivot/kV", IntakeConstants.Pivot.getGains().kV());
+  private final LoggedTunableNumber pivot_kA =
+      new LoggedTunableNumber("IntakePivot/kA", IntakeConstants.Pivot.getGains().kA());
+  private final LoggedTunableNumber pivot_kP =
+      new LoggedTunableNumber("IntakePivot/kP", IntakeConstants.Pivot.getGains().kP());
+  private final LoggedTunableNumber pivot_kD =
+      new LoggedTunableNumber("IntakePivot/kD", IntakeConstants.Pivot.getGains().kD());
 
   public Intake(RollersIO rollersIO, PivotIO pivotIO) {
     super("Intake", rollersIO);
@@ -44,6 +49,5 @@ public class Intake extends Rollers {
         pivot_kD);
 
     super.periodic();
-    pivot.periodic();
   }
 }

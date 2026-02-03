@@ -16,19 +16,18 @@ public final class IntakeConstants {
       new RollersConstants(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
 
   public static final class Pivot {
-
     private static final ControlSystemConstants GAINS =
         new ControlSystemConstants(
             ControlSystemConstants.EMPTY_GAINS,
             new ControlSystemContext(
-                0.2, // kS
-                0.01, // kV
-                1, // kA
-                5.0, // kP
-                0.0, // kD
-                5 / 1.0, // gear ratio
-                Optional.of(1.0),
-                Optional.of(1.0)));
+                0.12,
+                0.05,
+                0.0,
+                0.0,
+                1.0,
+                0.4,
+                Optional.of(5.0),
+                Optional.of(20.0)));
 
     public static ControlSystemContext getGains() {
       return GAINS.getConstants();
