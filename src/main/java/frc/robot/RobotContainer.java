@@ -117,7 +117,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         intake =
             new Intake(
-                new RollersIOTalonFX(IntakeConstants.CAN_ID, "rio", IntakeConstants.ROLLERS));
+                new RollersIOTalonFX(
+                    IntakeConstants.ROLLER_CAN_ID, IntakeConstants.CANBUS, IntakeConstants.ROLLERS),
+                new PivotIOTalonFX(
+                    IntakeConstants.PIVOT_CAN_ID,
+                    IntakeConstants.CANBUS,
+                    new PivotTalonFXConstants(IntakeConstants.Pivot.getGains(), false, 1)));
 
         vision =
             Vision.createPerCameraVision(
@@ -161,7 +166,9 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         intake =
-            new Intake(new RollersIOSim(DCMotor.getKrakenX60(1), 0.01, IntakeConstants.ROLLERS));
+            new Intake(
+                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
+                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.getGains()));
 
         vision =
             Vision.createPerCameraVision(
@@ -193,7 +200,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        intake = new Intake(new RollersIO() {});
+        intake = new Intake(new RollersIO() {}, new PivotIO() {});
         vision =
             Vision.createPerCameraVision(
                 drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
@@ -254,6 +261,20 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> Rotation2d.kZero));
+
+    // 0
+    controller
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> intake.pivot.setTargetAngle(Radians.of(Math.toRadians(0))), intake));
+
+    // 90
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () -> intake.pivot.setTargetAngle(Radians.of(Math.toRadians(90))), intake));
 
     controller
         .rightTrigger()
