@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -64,6 +67,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Climber climber;
   private final Intake intake;
   private final Vision vision;
 
@@ -121,6 +125,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        climber = new Climber(new ClimberIO() {});
         intake =
             new Intake(
                 new RollersIOTalonFX(
@@ -172,6 +178,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
+        climber = new Climber(new ClimberIOSim());
         intake =
             new Intake(
                 new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
@@ -210,6 +217,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
+        climber = new Climber(new ClimberIO() {});
         intake = new Intake(new RollersIO() {}, new PivotIO() {});
         vision =
             Vision.createPerCameraVision(
@@ -304,6 +312,8 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    controller.povUp().onTrue(climber.extend());
+    controller.povDown().onTrue(climber.retract());
     controller
         .leftTrigger()
         .whileTrue(
