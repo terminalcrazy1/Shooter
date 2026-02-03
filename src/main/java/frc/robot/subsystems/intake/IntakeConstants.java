@@ -20,14 +20,7 @@ public final class IntakeConstants {
         new ControlSystemConstants(
             ControlSystemConstants.EMPTY_GAINS,
             new ControlSystemContext(
-                0.12,
-                0.05,
-                0.0,
-                0.0,
-                1.0,
-                0.4,
-                Optional.of(5.0),
-                Optional.of(20.0)));
+                0.12, 0.05, 0.0, 0.0, 1.0, 0.4, Optional.of(5.0), Optional.of(20.0)));
 
     public static ControlSystemContext getGains() {
       return GAINS.getConstants();

@@ -16,11 +16,11 @@ public class Rollers extends SubsystemBase {
   }
 
   public Command runVolts(double volts) {
-    return this.runOnce(() -> io.setVolts(volts));
+    return this.runEnd(() -> io.setVolts(volts), () -> io.setVolts(0));
   }
 
   public Command runVelocity(double velocityRadPerSec) {
-    return this.runOnce(() -> io.setVelocity(velocityRadPerSec));
+    return this.runEnd(() -> io.setVelocity(velocityRadPerSec), () -> io.setVelocity(0));
   }
 
   @Override
