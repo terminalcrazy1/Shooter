@@ -6,35 +6,21 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class Intake extends Rollers {
 
-  // Tunable PID / feedforward numbers for live tuning
-  private final LoggedTunableNumber kS =
-      new LoggedTunableNumber("Intake/kS", IntakeConstants.ROLLER_CONSTANTS.kS);
-  private final LoggedTunableNumber kV =
-      new LoggedTunableNumber("Intake/kV", IntakeConstants.ROLLER_CONSTANTS.kV);
-  private final LoggedTunableNumber kP =
-      new LoggedTunableNumber("Intake/kP", IntakeConstants.ROLLER_CONSTANTS.kP);
-  private final LoggedTunableNumber kD =
-      new LoggedTunableNumber("Intake/kD", IntakeConstants.ROLLER_CONSTANTS.kD);
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Intake/kS", 0.2);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Intake/kV", 0.01);
+  private final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 5.0);
+  private final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0.0);
 
   public Intake(RollersIO io) {
-    super("Intake", io, IntakeConstants.ROLLER_CONSTANTS);
-
-    // Apply initial PID constants to the IO
-    io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
+    super("Intake", io);
   }
 
   @Override
   public void periodic() {
-    super.periodic();
+    int id = hashCode();
 
-    // Update PID / feedforward constants if changed on the dashboard
     LoggedTunableNumber.ifChanged(
-        hashCode(),
-        (constants) ->
-            getIO().setControlConstants(constants[0], constants[1], constants[2], constants[3]),
-        kS,
-        kV,
-        kP,
-        kD);
+        id, c -> getIO().setControlConstants(c[0], c[1], c[2], c[3]), kS, kV, kP, kD);
+    super.periodic();
   }
 }

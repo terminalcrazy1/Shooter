@@ -115,11 +115,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
         intake =
             new Intake(
-                new RollersIOTalonFX(
-                    IntakeConstants.CAN_ID, "rio", IntakeConstants.ROLLER_CONSTANTS));
+                new RollersIOTalonFX(IntakeConstants.CAN_ID, "rio", IntakeConstants.ROLLERS));
 
         vision =
             Vision.createPerCameraVision(
@@ -163,8 +161,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         intake =
-            new Intake(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 0.01, IntakeConstants.ROLLER_CONSTANTS));
+            new Intake(new RollersIOSim(DCMotor.getKrakenX60(1), 0.01, IntakeConstants.ROLLERS));
 
         vision =
             Vision.createPerCameraVision(
