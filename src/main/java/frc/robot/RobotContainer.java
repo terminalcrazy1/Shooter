@@ -39,6 +39,10 @@ import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.FlywheelIO;
+import frc.robot.subsystems.shooter.FlywheelIOSim;
+import frc.robot.subsystems.shooter.FlywheelIOTalonFX;
 import frc.robot.subsystems.shooter.Hood;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Turret;
@@ -65,6 +69,7 @@ public class RobotContainer {
 
   private final Turret turret;
   private final Hood hood;
+  private final Flywheel flywheel;
 
   private final Superstructure superstructure;
 
@@ -141,7 +146,7 @@ public class RobotContainer {
                     ShooterConstants.Turret.CAN_ID,
                     ShooterConstants.Turret.CANBUS,
                     new PivotTalonFXConstants(
-                        ShooterConstants.Turret.getGains(),
+                        ShooterConstants.Turret.getConstants(),
                         false,
                         ShooterConstants.Turret.GEAR_RATIO)));
         hood =
@@ -150,9 +155,10 @@ public class RobotContainer {
                     ShooterConstants.Hood.CAN_ID,
                     ShooterConstants.Hood.CANBUS,
                     new PivotTalonFXConstants(
-                        ShooterConstants.Hood.getGains(),
+                        ShooterConstants.Hood.getConstants(),
                         false,
                         ShooterConstants.Hood.GEAR_RATIO)));
+        flywheel = new Flywheel(new FlywheelIOTalonFX());
         break;
 
       case SIM:
@@ -187,8 +193,11 @@ public class RobotContainer {
                     VisionConstants.robotToCamera2,
                     () -> drive.getPose()));
         turret =
-            new Turret(new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.getGains()));
-        hood = new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getGains()));
+            new Turret(
+                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.getConstants()));
+        hood =
+            new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getConstants()));
+        flywheel = new Flywheel(new FlywheelIOSim());
         break;
 
       default:
@@ -208,6 +217,8 @@ public class RobotContainer {
 
         turret = new Turret(new PivotIO() {});
         hood = new Hood(new PivotIO() {});
+        flywheel = new Flywheel(new FlywheelIO() {});
+
         break;
     }
 
@@ -314,7 +325,8 @@ public class RobotContainer {
                     Radians.of(
                         getAllianceHubPose()
                             .getTranslation()
-                            .getDistance(drive.getPose().getTranslation()))));
+                            .getDistance(drive.getPose().getTranslation()))))
+        .whileTrue(flywheel.runVelocityRadPerSec(5.0));
   }
 
   /**
