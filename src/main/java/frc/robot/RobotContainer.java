@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -115,11 +116,14 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
         intake =
             new Intake(
                 new RollersIOTalonFX(
-                    IntakeConstants.CAN_ID, "rio", IntakeConstants.ROLLER_CONSTANTS));
+                    IntakeConstants.ROLLER_CAN_ID, IntakeConstants.CANBUS, IntakeConstants.ROLLERS),
+                new PivotIOTalonFX(
+                    IntakeConstants.PIVOT_CAN_ID,
+                    IntakeConstants.CANBUS,
+                    new PivotTalonFXConstants(IntakeConstants.Pivot.getGains(), false, 1)));
 
         vision =
             Vision.createPerCameraVision(
@@ -164,7 +168,8 @@ public class RobotContainer {
 
         intake =
             new Intake(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 0.01, IntakeConstants.ROLLER_CONSTANTS));
+                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
+                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.getGains()));
 
         vision =
             Vision.createPerCameraVision(
@@ -196,7 +201,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        intake = new Intake(new RollersIO() {});
+        intake = new Intake(new RollersIO() {}, new PivotIO() {});
         vision =
             Vision.createPerCameraVision(
                 drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
@@ -257,6 +262,12 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> Rotation2d.kZero));
+
+    // 0 degrees
+    controller.x().onTrue(intake.pivot.setTargetAngle(Degrees.of(0)));
+
+    // 90 degrees
+    controller.b().onTrue(intake.pivot.setTargetAngle(Degrees.of(90)));
 
     controller
         .rightTrigger()
