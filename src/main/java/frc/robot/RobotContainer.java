@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -42,6 +43,8 @@ import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.serializer.Serializer;
+import frc.robot.subsystems.serializer.SerializerConstants;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.FlywheelIO;
 import frc.robot.subsystems.shooter.FlywheelIOSim;
@@ -55,6 +58,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.ComponentPoseUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -69,6 +73,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Climber climber;
   private final Intake intake;
+  private final Serializer serializer;
   private final Vision vision;
 
   private final Turret turret;
@@ -136,6 +141,10 @@ public class RobotContainer {
                     IntakeConstants.CANBUS,
                     new PivotTalonFXConstants(IntakeConstants.Pivot.getGains(), false, 1)));
 
+        serializer =
+            new Serializer(
+                new RollersIOTalonFX(
+                    SerializerConstants.CAN_ID, "rio", SerializerConstants.ROLLERS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -184,6 +193,9 @@ public class RobotContainer {
                 new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
                 new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.getGains()));
 
+        serializer =
+            new Serializer(
+                new RollersIOSim(DCMotor.getKrakenX60(1), 5, SerializerConstants.ROLLERS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -205,6 +217,7 @@ public class RobotContainer {
         hood =
             new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getConstants()));
         flywheel = new Flywheel(new FlywheelIOSim());
+
         break;
 
       default:
@@ -226,10 +239,12 @@ public class RobotContainer {
         turret = new Turret(new PivotIO() {});
         hood = new Hood(new PivotIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        serializer = new Serializer(new RollersIO() {});
 
         break;
     }
-
+    NamedCommands.registerCommand("StowIntake", intake.pivot.setTargetAngle(Degrees.of(0)));
+    NamedCommands.registerCommand("DeployIntake", intake.pivot.setTargetAngle(Degrees.of(-90)));
     this.superstructure = new Superstructure(drive, turret, () -> getAllianceHubPose());
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -269,10 +284,8 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Test intake
-    controller.y().whileTrue(intake.runVelocity(5));
+    controller.y().whileTrue(serializer.runVelocity(15));
 
-    // Lock to 0° when A button is held
     controller
         .a()
         .whileTrue(
@@ -286,7 +299,7 @@ public class RobotContainer {
     controller.x().onTrue(intake.pivot.setTargetAngle(Degrees.of(0)));
 
     // 90 degrees
-    controller.b().onTrue(intake.pivot.setTargetAngle(Degrees.of(90)));
+    controller.b().onTrue(intake.pivot.setTargetAngle(Degrees.of(-90)));
 
     controller
         .rightTrigger()
@@ -346,5 +359,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public void updateComponentPoses() {
+    ComponentPoseUtil.publishComponentPoses(serializer, turret, intake.pivot, climber);
   }
 }

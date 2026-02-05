@@ -32,4 +32,8 @@ public class Rollers extends SubsystemBase {
   public RollersIO getIO() {
     return io;
   }
+
+  public double getPositionRads() {
+    return inputs.positionRads;
+  }
 }
