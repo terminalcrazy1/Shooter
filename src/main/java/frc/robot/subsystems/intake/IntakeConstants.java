@@ -7,24 +7,23 @@ import frc.robot.subsystems.rollers.RollersSpecifications;
 import java.util.Optional;
 
 public final class IntakeConstants {
-
-  public static final int ROLLER_CAN_ID = 14;
-  public static final int PIVOT_CAN_ID = 17;
   public static final String CANBUS = "rio";
 
-  public static final RollersSpecifications ROLLERS_SPEC =
-      new RollersSpecifications(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
+  public static final class Rollers {
+    public static final int CAN_ID = 14;
+
+    public static final RollersSpecifications SPECS =
+        new RollersSpecifications(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
+  }
 
   public static final class Pivot {
-    private static final ControlSystemConstants GAINS =
+    public static final int CAN_ID = 17;
+
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS,
+            ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
                 0.12, 0.05, 0.0, 0.0, 1.0, 0.4, Optional.of(5.0), Optional.of(20.0)));
-
-    public static ControlSystemContext getGains() {
-      return GAINS.getConstants();
-    }
   }
 
   private IntakeConstants() {}

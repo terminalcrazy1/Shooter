@@ -15,16 +15,18 @@ public class Flywheel extends SubsystemBase {
   private double targetVelocityRadsPerSec = 0.0;
 
   private final LoggedTunableNumber kV =
-      new LoggedTunableNumber("Shooter/Flywheel/kV", ShooterConstants.Flywheel.getConstants().kV());
+      new LoggedTunableNumber("Shooter/Flywheel/kV", ShooterConstants.Flywheel.SYSTEM_CONSTANTS.kV);
   private final LoggedTunableNumber kS =
-      new LoggedTunableNumber("Shooter/Flywheel/kS", ShooterConstants.Flywheel.getConstants().kS());
+      new LoggedTunableNumber("Shooter/Flywheel/kS", ShooterConstants.Flywheel.SYSTEM_CONSTANTS.kS);
   private final LoggedTunableNumber kP =
-      new LoggedTunableNumber("Shooter/Flywheel/kP", ShooterConstants.Flywheel.getConstants().kP());
+      new LoggedTunableNumber("Shooter/Flywheel/kP", ShooterConstants.Flywheel.SYSTEM_CONSTANTS.kP);
   private final LoggedTunableNumber kD =
-      new LoggedTunableNumber("Shooter/Flywheel/kD", ShooterConstants.Flywheel.getConstants().kD());
+      new LoggedTunableNumber("Shooter/Flywheel/kD", ShooterConstants.Flywheel.SYSTEM_CONSTANTS.kD);
 
   public Flywheel(FlywheelIO io) {
     this.io = io;
+
+    io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
   }
 
   public Command runVolts(double volts) {

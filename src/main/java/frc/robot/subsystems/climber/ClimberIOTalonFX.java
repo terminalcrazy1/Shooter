@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ControlSystemContext;
+import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.util.PhoenixUtil;
 
 public class ClimberIOTalonFX implements ClimberIO {
@@ -39,19 +39,19 @@ public class ClimberIOTalonFX implements ClimberIO {
   public ClimberIOTalonFX() {
     motor = new TalonFX(ClimberConstants.CAN_ID, ClimberConstants.CANBUS);
 
-    ControlSystemContext constants = ClimberConstants.getConstants();
+    ControlSystemConstants constants = ClimberConstants.SYSTEM_CONSTANTS;
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.SensorToMechanismRatio =
         ClimberConstants.GEAR_RATIO / (2 * Math.PI * ClimberConstants.DRUM_RADIUS_METERS);
 
-    config.Slot0.kG = constants.kG();
-    config.Slot0.kS = constants.kS();
-    config.Slot0.kV = constants.kV();
-    config.Slot0.kA = constants.kA();
-    config.Slot0.kP = constants.kP();
-    config.Slot0.kD = constants.kD();
+    config.Slot0.kG = constants.kG;
+    config.Slot0.kS = constants.kS;
+    config.Slot0.kV = constants.kV;
+    config.Slot0.kA = constants.kA;
+    config.Slot0.kP = constants.kP;
+    config.Slot0.kD = constants.kD;
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(config));
 

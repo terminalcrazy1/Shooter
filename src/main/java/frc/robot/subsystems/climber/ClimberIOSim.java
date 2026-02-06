@@ -13,8 +13,8 @@ public class ClimberIOSim implements ClimberIO {
 
   private final ElevatorSim physicsSim =
       new ElevatorSim(
-          ClimberConstants.getConstants().kV(),
-          ClimberConstants.getConstants().kA(),
+          ClimberConstants.SYSTEM_CONSTANTS.kV,
+          ClimberConstants.SYSTEM_CONSTANTS.kA,
           DCMotor.getKrakenX60(1),
           0,
           5,
@@ -22,16 +22,16 @@ public class ClimberIOSim implements ClimberIO {
           0);
   private final ProfiledPIDController pidController =
       new ProfiledPIDController(
-          ClimberConstants.getConstants().kP(),
+          ClimberConstants.SYSTEM_CONSTANTS.kP,
           0,
-          ClimberConstants.getConstants().kD(),
+          ClimberConstants.SYSTEM_CONSTANTS.kD,
           new Constraints(0, 0));
   private final ElevatorFeedforward feedforwardController =
       new ElevatorFeedforward(
-          ClimberConstants.getConstants().kS(),
-          ClimberConstants.getConstants().kG(),
-          ClimberConstants.getConstants().kV(),
-          ClimberConstants.getConstants().kA());
+          ClimberConstants.SYSTEM_CONSTANTS.kS,
+          ClimberConstants.SYSTEM_CONSTANTS.kG,
+          ClimberConstants.SYSTEM_CONSTANTS.kV,
+          ClimberConstants.SYSTEM_CONSTANTS.kA);
 
   @Override
   public void updateInputs(ClimberIOInputsAutoLogged inputs) {

@@ -17,7 +17,7 @@ public final class IndexerConstants {
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS,
+            ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
                 0.01, 0.01, 0.15, 0.0, 5.0, 0.0, Optional.empty(), Optional.empty()));
   }
@@ -30,7 +30,7 @@ public final class IndexerConstants {
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS, Serializer.SYSTEM_CONSTANTS.SIM_GAINS);
+            ControlSystemConstants.EMPTY_CONTEXT, Serializer.SYSTEM_CONSTANTS.SIM_CONTEXT);
   }
 
   private IndexerConstants() {}

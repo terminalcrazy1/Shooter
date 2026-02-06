@@ -11,15 +11,11 @@ public final class ShooterConstants {
 
     public static final String CANBUS = "rio";
 
-    private static final ControlSystemConstants GAINS =
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS,
+            ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
                 0.12, 0.05, 0.0, 0.0, 0.5, 0.0, Optional.empty(), Optional.empty()));
-
-    public static ControlSystemContext getConstants() {
-      return GAINS.getConstants();
-    }
 
     public static final double GEAR_RATIO = 1.0;
     public static final double WHEEL_RADIUS_METERS = 0.1;
@@ -30,15 +26,11 @@ public final class ShooterConstants {
 
     public static final String CANBUS = "rio";
 
-    private static final ControlSystemConstants GAINS =
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS,
+            ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
                 1.0, 0.05, 0, 0, 20, 0.5, Optional.of(60.0), Optional.of(100.0)));
-
-    public static ControlSystemContext getConstants() {
-      return GAINS.getConstants();
-    }
 
     public static final double GEAR_RATIO = 1 / 52.0;
     public static final double MIN_ANGLE_RADS = -190 * (Math.PI / 180);
@@ -50,15 +42,11 @@ public final class ShooterConstants {
 
     public static final String CANBUS = "rio";
 
-    private static final ControlSystemConstants GAINS =
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_GAINS,
+            ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
                 4.44, 0.1, 0.0, 0.0, 1.0, 0.0, Optional.of(1.0), Optional.of(1.0)));
-
-    public static ControlSystemContext getConstants() {
-      return GAINS.getConstants();
-    }
 
     public static final double GEAR_RATIO = 1.0;
   }

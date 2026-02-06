@@ -12,28 +12,31 @@ import org.littletonrobotics.junction.Logger;
 
 public class Turret extends Pivot {
   private final LoggedTunableNumber kS =
-      new LoggedTunableNumber("Shooter/Turret/kS", ShooterConstants.Turret.getConstants().kS());
+      new LoggedTunableNumber("Shooter/Turret/kS", ShooterConstants.Turret.SYSTEM_CONSTANTS.kS);
   private final LoggedTunableNumber kV =
-      new LoggedTunableNumber("Shooter/Turret/kV", ShooterConstants.Turret.getConstants().kV());
+      new LoggedTunableNumber("Shooter/Turret/kV", ShooterConstants.Turret.SYSTEM_CONSTANTS.kV);
   private final LoggedTunableNumber kA =
-      new LoggedTunableNumber("Shooter/Turret/kA", ShooterConstants.Turret.getConstants().kA());
+      new LoggedTunableNumber("Shooter/Turret/kA", ShooterConstants.Turret.SYSTEM_CONSTANTS.kA);
   private final LoggedTunableNumber kP =
-      new LoggedTunableNumber("Shooter/Turret/kP", ShooterConstants.Turret.getConstants().kP());
+      new LoggedTunableNumber("Shooter/Turret/kP", ShooterConstants.Turret.SYSTEM_CONSTANTS.kP);
   private final LoggedTunableNumber kD =
-      new LoggedTunableNumber("Shooter/Turret/kD", ShooterConstants.Turret.getConstants().kD());
+      new LoggedTunableNumber("Shooter/Turret/kD", ShooterConstants.Turret.SYSTEM_CONSTANTS.kD);
 
   private final LoggedTunableNumber maxVelocity =
       new LoggedTunableNumber(
-          "Shooter/Turret/MaxVelocity", ShooterConstants.Turret.getConstants().maxVelocity().get());
+          "Shooter/Turret/MaxVelocity", ShooterConstants.Turret.SYSTEM_CONSTANTS.maxVelocity.get());
   private final LoggedTunableNumber maxAcceleration =
       new LoggedTunableNumber(
           "Shooter/Turret/MaxAcceleration",
-          ShooterConstants.Turret.getConstants().maxAcceleration().get());
+          ShooterConstants.Turret.SYSTEM_CONSTANTS.maxAcceleration.get());
 
   private final double FULL_CIRCLE_RADS = Math.PI * 2;
 
   public Turret(PivotIO pivotIO) {
     super("Shooter/Turret", pivotIO);
+
+    pivotIO.setControlConstants(kS.get(), kV.get(), kA.get(), kP.get(), kD.get());
+    pivotIO.setMotionProfile(maxVelocity.get(), maxAcceleration.get());
   }
 
   public Command lockOntoTarget(
