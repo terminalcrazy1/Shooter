@@ -1,14 +1,14 @@
 package frc.robot.subsystems.balltunneler;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.rollers.RollersConstants;
+import frc.robot.subsystems.rollers.RollersSpecifications;
 
 public final class BallTunnelerConstants {
 
   public static final int CAN_ID = 16;
 
-  public static final RollersConstants ROLLERS =
-      new RollersConstants(
+  public static final RollersSpecifications ROLLERS =
+      new RollersSpecifications(
           1.0 / 10.0, // gear ratio
           false, // inverted
           40, // current limit (amps)

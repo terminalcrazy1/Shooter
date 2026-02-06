@@ -3,7 +3,7 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
-import frc.robot.subsystems.rollers.RollersConstants;
+import frc.robot.subsystems.rollers.RollersSpecifications;
 import java.util.Optional;
 
 public final class IntakeConstants {
@@ -12,8 +12,8 @@ public final class IntakeConstants {
   public static final int PIVOT_CAN_ID = 17;
   public static final String CANBUS = "rio";
 
-  public static final RollersConstants ROLLERS =
-      new RollersConstants(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
+  public static final RollersSpecifications ROLLERS_SPEC =
+      new RollersSpecifications(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
 
   public static final class Pivot {
     private static final ControlSystemConstants GAINS =

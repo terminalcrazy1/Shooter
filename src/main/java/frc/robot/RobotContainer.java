@@ -135,7 +135,9 @@ public class RobotContainer {
         intake =
             new Intake(
                 new RollersIOTalonFX(
-                    IntakeConstants.ROLLER_CAN_ID, IntakeConstants.CANBUS, IntakeConstants.ROLLERS),
+                    IntakeConstants.ROLLER_CAN_ID,
+                    IntakeConstants.CANBUS,
+                    IntakeConstants.ROLLERS_SPEC),
                 new PivotIOTalonFX(
                     IntakeConstants.PIVOT_CAN_ID,
                     IntakeConstants.CANBUS,
@@ -190,7 +192,7 @@ public class RobotContainer {
         climber = new Climber(new ClimberIOSim());
         intake =
             new Intake(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
+                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS_SPEC),
                 new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.getGains()));
 
         serializer =

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 public class RollersIOSim implements RollersIO {
 
   private final DCMotorSim sim;
-  private final RollersConstants constants;
+  private final RollersSpecifications constants;
 
   private double appliedVoltage = 0.0;
   private double targetVelocityRadPerSec = 0.0;
@@ -18,7 +18,7 @@ public class RollersIOSim implements RollersIO {
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.0, 0.0);
   private final PIDController feedback = new PIDController(0.0, 0.0, 0.0);
 
-  public RollersIOSim(DCMotor motor, double moi, RollersConstants constants) {
+  public RollersIOSim(DCMotor motor, double moi, RollersSpecifications constants) {
     this.constants = constants;
 
     sim =
