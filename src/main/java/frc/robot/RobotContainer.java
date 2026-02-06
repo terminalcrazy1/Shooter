@@ -34,6 +34,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.indexer.IndexerConstants;
+import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.pivot.PivotIO;
@@ -43,8 +45,6 @@ import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
-import frc.robot.subsystems.serializer.Serializer;
-import frc.robot.subsystems.serializer.SerializerConstants;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.FlywheelIO;
 import frc.robot.subsystems.shooter.FlywheelIOSim;
@@ -146,7 +146,9 @@ public class RobotContainer {
         serializer =
             new Serializer(
                 new RollersIOTalonFX(
-                    SerializerConstants.CAN_ID, "rio", SerializerConstants.ROLLERS));
+                    IndexerConstants.Serializer.CAN_ID,
+                    IndexerConstants.CANBUS,
+                    IndexerConstants.Serializer.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -197,7 +199,8 @@ public class RobotContainer {
 
         serializer =
             new Serializer(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 5, SerializerConstants.ROLLERS));
+                new RollersIOSim(
+                    DCMotor.getKrakenX60(1), 5, IndexerConstants.Serializer.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,

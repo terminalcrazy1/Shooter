@@ -42,20 +42,20 @@ public final class Constants {
   public static class ControlSystemConstants {
     public static final ControlSystemContext EMPTY_GAINS =
         new ControlSystemContext(0, 0, 0, 0, 0, 0, Optional.empty(), Optional.empty());
-    private final ControlSystemContext rModeGains;
-    private final ControlSystemContext sModeGains;
+    public final ControlSystemContext REAL_GAINS;
+    public final ControlSystemContext SIM_GAINS;
 
     public ControlSystemConstants(ControlSystemContext realGains, ControlSystemContext simGains) {
-      rModeGains = realGains;
-      sModeGains = simGains;
+      REAL_GAINS = realGains;
+      SIM_GAINS = simGains;
     }
 
     public ControlSystemContext getConstants() {
       switch (currentMode) {
         case REAL:
-          return rModeGains;
+          return REAL_GAINS;
         case SIM:
-          return sModeGains;
+          return SIM_GAINS;
         default:
           return EMPTY_GAINS;
       }

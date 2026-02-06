@@ -1,0 +1,37 @@
+package frc.robot.subsystems.indexer;
+
+import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.ControlSystemConstants;
+import frc.robot.Constants.ControlSystemContext;
+import frc.robot.subsystems.rollers.RollersSpecifications;
+import java.util.Optional;
+
+public final class IndexerConstants {
+  public static final String CANBUS = "rio";
+
+  public static final class Serializer {
+    public static final int CAN_ID = 15;
+
+    public static final RollersSpecifications ROLLERS_SPECS =
+        new RollersSpecifications(5, true, 40, Units.inchesToMeters(8));
+
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
+        new ControlSystemConstants(
+            ControlSystemConstants.EMPTY_GAINS,
+            new ControlSystemContext(
+                0.01, 0.01, 0.15, 0.0, 5.0, 0.0, Optional.empty(), Optional.empty()));
+  }
+
+  public static final class BallTunneler {
+    public static final int CAN_ID = 16;
+
+    public static final RollersSpecifications ROLLERS_SPECS =
+        new RollersSpecifications(1.0 / 10.0, false, 40, Units.inchesToMeters(13.08 / 2.0));
+
+    public static final ControlSystemConstants SYSTEM_CONSTANTS =
+        new ControlSystemConstants(
+            ControlSystemConstants.EMPTY_GAINS, Serializer.SYSTEM_CONSTANTS.SIM_GAINS);
+  }
+
+  private IndexerConstants() {}
+}
