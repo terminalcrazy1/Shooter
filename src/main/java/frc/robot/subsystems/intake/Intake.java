@@ -7,15 +7,15 @@ import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.util.LoggedTunableNumber;
 
 public class Intake extends Rollers {
-    
-  private final LoggedTunableNumber rollers_kS = 
-  new LoggedTunableNumber("Intake/kS",  IntakeConstants.Rollers.SYSTEM_CONSTANTS.kS);
-  private final LoggedTunableNumber rollers_kV = 
-  new LoggedTunableNumber("Intake/kV", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kV);
-  private final LoggedTunableNumber rollers_kP = 
-  new LoggedTunableNumber("Intake/kP", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kP);
-  private final LoggedTunableNumber rollers_kD = 
-  new LoggedTunableNumber("Intake/kD", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kD);
+
+  private final LoggedTunableNumber rollers_kS =
+      new LoggedTunableNumber("Intake/kS", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kS);
+  private final LoggedTunableNumber rollers_kV =
+      new LoggedTunableNumber("Intake/kV", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kV);
+  private final LoggedTunableNumber rollers_kP =
+      new LoggedTunableNumber("Intake/kP", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kP);
+  private final LoggedTunableNumber rollers_kD =
+      new LoggedTunableNumber("Intake/kD", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kD);
 
   public final Pivot pivot;
   private final LoggedTunableNumber pivot_kS =

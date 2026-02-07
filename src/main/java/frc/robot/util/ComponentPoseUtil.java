@@ -45,6 +45,6 @@ public class ComponentPoseUtil {
             ? new Pose3d(new Translation3d(0, 0, climber.getPositionMeters()), new Rotation3d())
             : new Pose3d();
 
-    Logger.recordOutput("Robot/ComponentPoses", poses);
+    Logger.recordOutput("RobotRendering/ComponentPoses", poses);
   }
 }
