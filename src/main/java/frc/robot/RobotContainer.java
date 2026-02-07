@@ -38,6 +38,7 @@ import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.PivotIOTalonFXWithCancoder;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
@@ -138,7 +139,7 @@ public class RobotContainer {
                     IntakeConstants.Rollers.CAN_ID,
                     IntakeConstants.CANBUS,
                     IntakeConstants.Rollers.SPECS),
-                new PivotIOTalonFX(
+                new PivotIOTalonFXWithCancoder(
                     IntakeConstants.Pivot.CAN_ID,
                     IntakeConstants.CANBUS,
                     new PivotTalonFXConstants(false, 1)));
