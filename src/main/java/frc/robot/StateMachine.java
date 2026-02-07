@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,24 +45,33 @@ public class StateMachine<State extends Enum<State>> {
     this.stateTriggers = Collections.unmodifiableMap(modifiableStateTriggers);
   }
 
-  /** @return The current state of the state machine */
+  /**
+   * @return The current state of the state machine
+   */
   public State getState() {
     return currentState;
   }
 
   /**
    * Forces a certain state
+   *
    * @param newState The new state the state machine should be in
-  */
+   */
   public void forceState(State newState) {
     this.currentState = newState;
   }
 
+  public boolean isInState(State stateToCompareTo) {
+    return this.currentState.equals(stateToCompareTo);
+  }
+
   /**
-   * Request to switch to a new state and returns a RequestCode representing whether it was successful
+   * Request to switch to a new state and returns a RequestCode representing whether it was
+   * successful
+   *
    * @param targetState The requested state
    * @return A {@link RequestCode} representing the request result
-  */
+   */
   public RequestCode requestState(State targetState) {
     // If the state is already set
     if (currentState.equals(targetState)) return RequestCode.ALREADY_SET;

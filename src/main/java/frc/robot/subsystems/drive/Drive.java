@@ -327,7 +327,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -387,6 +387,13 @@ public class Drive extends SubsystemBase {
   /** Returns the current angular velocity of the drivetrain in radians per sec */
   public double getAngularVelocityRadPerSec() {
     return getChassisSpeeds().omegaRadiansPerSecond;
+  }
+
+  /** Returns the current speed of the entire drivetrain */
+  public double getLinearSpeedMetersPerSec() {
+    ChassisSpeeds speeds = getChassisSpeeds();
+
+    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
   }
 
   /** Returns an array of module translations. */

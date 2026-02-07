@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 public class RollersIOSim implements RollersIO {
 
   private final DCMotorSim sim;
-  private final RollersSpecifications constants;
+  private final RollersSpecifications specs;
 
   private double appliedVoltage = 0.0;
   private double targetVelocityRadPerSec = 0.0;
@@ -18,28 +18,26 @@ public class RollersIOSim implements RollersIO {
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.0, 0.0);
   private final PIDController feedback = new PIDController(0.0, 0.0, 0.0);
 
-  public RollersIOSim(DCMotor motor, double moi, RollersSpecifications constants) {
-    this.constants = constants;
+  public RollersIOSim(DCMotor motor, double moi, RollersSpecifications specs) {
+    this.specs = specs;
 
-    sim =
-        new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motor, moi, constants.gearRatio()), motor);
+    sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moi, specs.gearRatio()), motor);
   }
 
   @Override
   public void updateInputs(RollersIOInputsAutoLogged inputs) {
     sim.update(0.02);
 
-    double motorTargetVel = targetVelocityRadPerSec / constants.gearRatio();
-    motorTargetVel *= constants.inverted() ? -1.0 : 1.0;
+    double motorTargetVel = targetVelocityRadPerSec / specs.gearRatio();
+    motorTargetVel *= specs.inverted() ? -1.0 : 1.0;
     double ffVolts = feedforward.calculate(motorTargetVel);
     double fbVolts = feedback.calculate(sim.getAngularVelocityRadPerSec(), motorTargetVel);
 
     setVolts(ffVolts + fbVolts);
 
     inputs.connected = true;
-    inputs.positionRads = sim.getAngularPositionRad() * constants.gearRatio();
-    inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec() * constants.gearRatio();
+    inputs.positionRads = sim.getAngularPositionRad() * specs.gearRatio();
+    inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec() * specs.gearRatio();
     inputs.appliedVoltage = appliedVoltage;
     inputs.supplyCurrentAmps = sim.getCurrentDrawAmps();
   }
@@ -51,8 +49,18 @@ public class RollersIOSim implements RollersIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadPerSec) {
+  public void setAngularVelocity(double velocityRadPerSec) {
     targetVelocityRadPerSec = velocityRadPerSec;
+  }
+
+  @Override
+  public void setLinearVelocity(double velocityMetersPerSec) {
+    targetVelocityRadPerSec = velocityMetersPerSec / specs.rollerRadiusMeters();
+  }
+
+  @Override
+  public void stop() {
+    targetVelocityRadPerSec = 0;
   }
 
   @Override

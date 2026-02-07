@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,6 +30,14 @@ public class Flywheel extends SubsystemBase {
     io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
   }
 
+  public Command setVolts(double volts) {
+    return this.runOnce(() -> io.setVolts(volts));
+  }
+
+  public Command setVelocityRadPerSec(double velocityRadPerSec) {
+    return this.runOnce(() -> io.setVelocity(velocityRadPerSec));
+  }
+
   public Command runVolts(double volts) {
     return this.runEnd(() -> io.setVolts(volts), () -> io.setVolts(0));
   }
@@ -45,8 +54,13 @@ public class Flywheel extends SubsystemBase {
         });
   }
 
+  public Command stop() {
+    return this.runOnce(io::stop);
+  }
+
   public Trigger atTargetVelocity() {
-    return new Trigger(() -> inputs.velocityRadsPerSec == targetVelocityRadsPerSec);
+    return new Trigger(
+        () -> MathUtil.isNear(targetVelocityRadsPerSec, inputs.velocityRadsPerSec, Math.PI / 2));
   }
 
   @Override

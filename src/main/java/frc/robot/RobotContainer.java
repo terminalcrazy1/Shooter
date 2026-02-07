@@ -8,13 +8,11 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -34,6 +32,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.indexer.BallTunneler;
 import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
@@ -74,6 +73,7 @@ public class RobotContainer {
   private final Climber climber;
   private final Intake intake;
   private final Serializer serializer;
+  private final BallTunneler ballTunneler;
   private final Vision vision;
 
   private final Turret turret;
@@ -83,7 +83,9 @@ public class RobotContainer {
   private final Superstructure superstructure;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+
   // Log field element positions
   @AutoLogOutput(key = "currentAllianceHubPose")
   public Pose2d getAllianceHubPose() {
@@ -117,7 +119,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -149,6 +150,12 @@ public class RobotContainer {
                     IndexerConstants.Serializer.CAN_ID,
                     IndexerConstants.CANBUS,
                     IndexerConstants.Serializer.ROLLERS_SPECS));
+        ballTunneler =
+            new BallTunneler(
+                new RollersIOTalonFX(
+                    IndexerConstants.BallTunneler.CAN_ID,
+                    IndexerConstants.CANBUS,
+                    IndexerConstants.BallTunneler.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -189,12 +196,19 @@ public class RobotContainer {
         intake =
             new Intake(
                 new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.Rollers.SPECS),
-                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.SYSTEM_CONSTANTS));
+                new PivotIOSim(
+                    DCMotor.getKrakenX60(1),
+                    IntakeConstants.Pivot.SYSTEM_CONSTANTS,
+                    IntakeConstants.Pivot.SPECS));
 
         serializer =
             new Serializer(
                 new RollersIOSim(
                     DCMotor.getKrakenX60(1), 5, IndexerConstants.Serializer.ROLLERS_SPECS));
+        ballTunneler =
+            new BallTunneler(
+                new RollersIOSim(
+                    DCMotor.getKrakenX44(1), 1, IndexerConstants.BallTunneler.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -212,10 +226,16 @@ public class RobotContainer {
                     () -> drive.getPose()));
         turret =
             new Turret(
-                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.SYSTEM_CONSTANTS));
+                new PivotIOSim(
+                    DCMotor.getKrakenX60(1),
+                    ShooterConstants.Turret.SYSTEM_CONSTANTS,
+                    ShooterConstants.Turret.SPECS));
         hood =
             new Hood(
-                new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
+                new PivotIOSim(
+                    DCMotor.getKrakenX44(1),
+                    ShooterConstants.Hood.SYSTEM_CONSTANTS,
+                    ShooterConstants.Hood.SPECS));
         flywheel = new Flywheel(new FlywheelIOSim());
 
         break;
@@ -240,12 +260,22 @@ public class RobotContainer {
         hood = new Hood(new PivotIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         serializer = new Serializer(new RollersIO() {});
+        ballTunneler = new BallTunneler(new RollersIO() {});
 
         break;
     }
     NamedCommands.registerCommand("StowIntake", intake.pivot.setTargetAngle(Degrees.of(0)));
     NamedCommands.registerCommand("DeployIntake", intake.pivot.setTargetAngle(Degrees.of(-90)));
-    this.superstructure = new Superstructure(drive, turret, () -> getAllianceHubPose());
+    this.superstructure =
+        new Superstructure(
+            drive,
+            intake,
+            serializer,
+            ballTunneler,
+            turret,
+            hood,
+            flywheel,
+            () -> getAllianceHubPose());
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -280,42 +310,12 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
-
-    controller.y().whileTrue(serializer.runVelocity(15));
-
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
-
-    // 0 degrees
-    controller.x().onTrue(intake.pivot.setTargetAngle(Degrees.of(0)));
-
-    // 90 degrees
-    controller.b().onTrue(intake.pivot.setTargetAngle(Degrees.of(-90)));
-
-    controller
-        .rightTrigger()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> controller.getLeftY(),
-                () -> controller.getLeftX(),
-                () ->
-                    getAllianceHubPose()
-                        .getTranslation()
-                        .minus(drive.getPose().getTranslation())
-                        .getAngle()));
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightX()));
 
     // Reset gyro to 0° when B button is pressed
-    controller
+    driverController
         .start()
         .onTrue(
             Commands.runOnce(
@@ -325,31 +325,38 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.povUp().onTrue(climber.extend());
-    controller.povDown().onTrue(climber.retract());
-    controller
-        .leftTrigger()
-        .whileTrue(
-            turret.lockOntoTarget(
-                () -> {
-                  Pose2d drivePose = this.drive.getPose();
-                  Rotation2d driveHeading = drivePose.getRotation();
-                  Translation2d driveToHubVector =
-                      getAllianceHubPose().getTranslation().minus(drivePose.getTranslation());
-                  Rotation2d pointToHubRotation =
-                      new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
+    // Shooting state reset
+    driverController.a().onTrue(superstructure.requestState(Superstructure.ShootingState.IDLE));
 
-                  return pointToHubRotation.minus(driveHeading).getMeasure();
-                },
-                () -> drive.getAngularVelocityRadPerSec()))
+    // Enter shooting mode
+    driverController
+        .b()
         .whileTrue(
-            hood.trackTarget(
-                () ->
-                    Radians.of(
-                        getAllianceHubPose()
-                            .getTranslation()
-                            .getDistance(drive.getPose().getTranslation()))))
-        .whileTrue(flywheel.runVelocityRadPerSec(5.0));
+            superstructure.continuouslyRequestState(Superstructure.ShootingState.READYING_SHOOTER));
+
+    // Start shooting and stop when let go
+    driverController
+        .rightTrigger()
+        .onTrue(superstructure.requestState(Superstructure.ShootingState.SHOOTING))
+        .onFalse(superstructure.requestState(Superstructure.ShootingState.READY_TO_SHOOT));
+
+    // Intaking
+    driverController
+        .leftTrigger()
+        .onTrue(superstructure.requestState(Superstructure.IntakingState.INTAKING))
+        .onFalse(superstructure.requestState(Superstructure.IntakingState.INTAKE_READY));
+
+    // Intake Slapdown
+    driverController
+        .leftBumper()
+        .onTrue(superstructure.requestState(Superstructure.IntakingState.DEPLOYING));
+
+    driverController
+        .rightBumper()
+        .onTrue(superstructure.requestState(Superstructure.IntakingState.STOWING));
+
+    driverController.povUp().onTrue(climber.extend());
+    driverController.povDown().onTrue(climber.retract());
   }
 
   /**

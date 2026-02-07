@@ -1,6 +1,9 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
 import frc.robot.subsystems.pivot.PivotSpecifications;
@@ -32,6 +35,9 @@ public final class IntakeConstants {
 
     public static final double CANCODER_GEAR_RATIO = 1.0;
     public static final double CANCODER_OFFSET_RAD = 0.0;
+
+    public static final Angle STOWED_ANGLE = Degrees.zero();
+    public static final Angle DEPLOYED_ANGLE = Degrees.of(90);
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(

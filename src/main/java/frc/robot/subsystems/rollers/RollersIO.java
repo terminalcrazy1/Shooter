@@ -14,15 +14,19 @@ public interface RollersIO {
     public boolean connected = false;
   }
 
-  default void updateInputs(RollersIOInputsAutoLogged inputs) {}
+  public default void updateInputs(RollersIOInputsAutoLogged inputs) {}
 
-  default void setVolts(double volts) {}
+  public default void setVolts(double volts) {}
 
-  default void setVelocity(double velocityRadPerSec) {}
+  public default void stop() {}
 
-  default void setControlConstants(double kS, double kV, double kP, double kD) {}
+  public default void setAngularVelocity(double velocityRadPerSec) {}
 
-  default double getVelocityRadPerSec() {
+  public default void setLinearVelocity(double velocityMetersPerSec) {}
+
+  public default void setControlConstants(double kS, double kV, double kP, double kD) {}
+
+  public default double getVelocityRadPerSec() {
     return 0.0;
   }
 }

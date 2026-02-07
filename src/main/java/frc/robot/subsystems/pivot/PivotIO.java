@@ -6,6 +6,7 @@ public interface PivotIO {
   @AutoLog
   // velocity and position are measured in mechanism units not motor units
   public static class PivotIOInputs {
+    public double targetPositionRads = 0.0;
     public double positionRads = 0.0;
     public double velocityRadsPerSec = 0.0;
     public double appliedVoltage = 0.0;
