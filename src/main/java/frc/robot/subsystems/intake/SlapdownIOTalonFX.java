@@ -22,7 +22,7 @@ public class SlapdownIOTalonFX extends PivotIOTalonFX {
   public SlapdownIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     super(canId, canBus, constants);
 
-    cancoder = new CANcoder(IntakeConstants.Pivot.PIVOT_CANCODER_ID, canBus);
+    cancoder = new CANcoder(IntakeConstants.Pivot.CANCODER_ID, canBus);
 
     CANcoderConfiguration config = new CANcoderConfiguration();
     config.MagnetSensor.MagnetOffset = IntakeConstants.Pivot.CANCODER_OFFSET_RAD / (2.0 * Math.PI);

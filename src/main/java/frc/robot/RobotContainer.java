@@ -139,7 +139,7 @@ public class RobotContainer {
                     IntakeConstants.CANBUS,
                     IntakeConstants.Rollers.SPECS),
                 new SlapdownIOTalonFX(
-                    IntakeConstants.Pivot.CAN_ID,
+                    IntakeConstants.Pivot.MOTOR_CAN_ID,
                     IntakeConstants.CANBUS,
                     IntakeConstants.Pivot.SPECS));
 
