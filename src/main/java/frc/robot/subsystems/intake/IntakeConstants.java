@@ -25,8 +25,8 @@ public final class IntakeConstants {
   }
 
   public static final class Pivot {
-    public static final int CAN_ID = 17;
-    public static final int PIVOT_CANCODER_ID = 18;
+    public static final int CAN_ID = 15;
+    public static final int PIVOT_CANCODER_ID = 16;
 
     public static final boolean CANCODER_CLOCKWISE_POSITIVE = true;
 

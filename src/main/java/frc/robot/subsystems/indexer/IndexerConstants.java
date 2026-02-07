@@ -10,7 +10,7 @@ public final class IndexerConstants {
   public static final String CANBUS = "rio";
 
   public static final class Serializer {
-    public static final int CAN_ID = 15;
+    public static final int CAN_ID = 17;
 
     public static final RollersSpecifications ROLLERS_SPECS =
         new RollersSpecifications(5, true, 40, Units.inchesToMeters(8));
@@ -23,7 +23,7 @@ public final class IndexerConstants {
   }
 
   public static final class BallTunneler {
-    public static final int CAN_ID = 16;
+    public static final int CAN_ID = 18;
 
     public static final RollersSpecifications ROLLERS_SPECS =
         new RollersSpecifications(1.0 / 10.0, false, 40, Units.inchesToMeters(13.08 / 2.0));

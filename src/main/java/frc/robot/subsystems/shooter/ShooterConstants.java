@@ -9,8 +9,8 @@ public final class ShooterConstants {
   public static final String CANBUS = "rio";
 
   public static final class Flywheel {
-    public static final int MASTER_CAN_ID = 0;
-    public static final int FOLLOWER_CAN_ID = 1;
+    public static final int MASTER_CAN_ID = 19;
+    public static final int FOLLOWER_CAN_ID = 20;
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
@@ -23,7 +23,7 @@ public final class ShooterConstants {
   }
 
   public static final class Turret {
-    public static final int CAN_ID = 2;
+    public static final int CAN_ID = 21;
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
@@ -38,7 +38,7 @@ public final class ShooterConstants {
   }
 
   public static final class Hood {
-    public static final int CAN_ID = 3;
+    public static final int CAN_ID = 22;
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
