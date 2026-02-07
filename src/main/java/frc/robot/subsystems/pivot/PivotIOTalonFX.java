@@ -17,7 +17,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ControlSystemContext;
 import frc.robot.util.PhoenixUtil;
 
 public class PivotIOTalonFX implements PivotIO {
@@ -38,33 +37,18 @@ public class PivotIOTalonFX implements PivotIO {
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-  public record PivotTalonFXConstants(
-      ControlSystemContext controlSystemConstants, boolean clockwisePositive, double gearRatio) {}
-
-  public PivotIOTalonFX(int canId, String canBus, PivotTalonFXConstants constants) {
+  @SuppressWarnings("removal")
+  public PivotIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     motor = new TalonFX(canId, canBus);
 
-    ControlSystemContext controlSystemConstants = constants.controlSystemConstants();
-
     motorConfig.MotorOutput.Inverted =
-        constants.clockwisePositive
+        constants.clockwisePositive()
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio;
-
-    motorConfig.Slot0.kV = controlSystemConstants.kV();
-    motorConfig.Slot0.kA = controlSystemConstants.kA();
-    motorConfig.Slot0.kS = controlSystemConstants.kS();
-
-    motorConfig.Slot0.kP = controlSystemConstants.kP();
-    motorConfig.Slot0.kD = controlSystemConstants.kD();
-
-    motorConfig.MotionMagic.MotionMagicCruiseVelocity = controlSystemConstants.maxVelocity().get();
-    motorConfig.MotionMagic.MotionMagicAcceleration =
-        controlSystemConstants.maxAcceleration().get();
+    motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio();
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(motorConfig));
 

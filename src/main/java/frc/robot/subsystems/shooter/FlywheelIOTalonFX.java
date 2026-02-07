@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ControlSystemContext;
+import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.util.PhoenixUtil;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
@@ -50,23 +50,21 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   @SuppressWarnings("removal")
   public FlywheelIOTalonFX() {
-    masterMotor =
-        new TalonFX(ShooterConstants.Flywheel.MASTER_CAN_ID, ShooterConstants.Flywheel.CANBUS);
-    followerMotor =
-        new TalonFX(ShooterConstants.Flywheel.FOLLOWER_CAN_ID, ShooterConstants.Flywheel.CANBUS);
+    masterMotor = new TalonFX(ShooterConstants.Flywheel.MASTER_CAN_ID, ShooterConstants.CANBUS);
+    followerMotor = new TalonFX(ShooterConstants.Flywheel.FOLLOWER_CAN_ID, ShooterConstants.CANBUS);
     followerMotor.setControl(new Follower(masterMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
-    ControlSystemContext constants = ShooterConstants.Flywheel.getConstants();
+    ControlSystemConstants constants = ShooterConstants.Flywheel.SYSTEM_CONSTANTS;
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     config.Feedback.SensorToMechanismRatio = ShooterConstants.Flywheel.GEAR_RATIO;
 
-    config.Slot0.kS = constants.kS();
-    config.Slot0.kV = constants.kV();
-    config.Slot0.kP = constants.kP();
-    config.Slot0.kD = constants.kD();
+    config.Slot0.kS = constants.kS;
+    config.Slot0.kV = constants.kV;
+    config.Slot0.kP = constants.kP;
+    config.Slot0.kD = constants.kD;
 
     PhoenixUtil.tryUntilOk(5, () -> masterMotor.getConfigurator().apply(config));
     PhoenixUtil.tryUntilOk(5, () -> followerMotor.getConfigurator().apply(config));

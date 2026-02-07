@@ -34,17 +34,17 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.indexer.IndexerConstants;
+import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.SlapdownIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
-import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
-import frc.robot.subsystems.serializer.Serializer;
-import frc.robot.subsystems.serializer.SerializerConstants;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.FlywheelIO;
 import frc.robot.subsystems.shooter.FlywheelIOSim;
@@ -135,16 +135,20 @@ public class RobotContainer {
         intake =
             new Intake(
                 new RollersIOTalonFX(
-                    IntakeConstants.ROLLER_CAN_ID, IntakeConstants.CANBUS, IntakeConstants.ROLLERS),
-                new PivotIOTalonFX(
-                    IntakeConstants.PIVOT_CAN_ID,
+                    IntakeConstants.Rollers.CAN_ID,
                     IntakeConstants.CANBUS,
-                    new PivotTalonFXConstants(IntakeConstants.Pivot.getGains(), false, 1)));
+                    IntakeConstants.Rollers.SPECS),
+                new SlapdownIOTalonFX(
+                    IntakeConstants.Pivot.CAN_ID,
+                    IntakeConstants.CANBUS,
+                    IntakeConstants.Pivot.SPECS));
 
         serializer =
             new Serializer(
                 new RollersIOTalonFX(
-                    SerializerConstants.CAN_ID, "rio", SerializerConstants.ROLLERS));
+                    IndexerConstants.Serializer.CAN_ID,
+                    IndexerConstants.CANBUS,
+                    IndexerConstants.Serializer.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -159,20 +163,14 @@ public class RobotContainer {
             new Turret(
                 new PivotIOTalonFX(
                     ShooterConstants.Turret.CAN_ID,
-                    ShooterConstants.Turret.CANBUS,
-                    new PivotTalonFXConstants(
-                        ShooterConstants.Turret.getConstants(),
-                        false,
-                        ShooterConstants.Turret.GEAR_RATIO)));
+                    ShooterConstants.CANBUS,
+                    ShooterConstants.Turret.SPECS));
         hood =
             new Hood(
                 new PivotIOTalonFX(
                     ShooterConstants.Hood.CAN_ID,
-                    ShooterConstants.Hood.CANBUS,
-                    new PivotTalonFXConstants(
-                        ShooterConstants.Hood.getConstants(),
-                        false,
-                        ShooterConstants.Hood.GEAR_RATIO)));
+                    ShooterConstants.CANBUS,
+                    ShooterConstants.Hood.SPECS));
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         break;
 
@@ -190,12 +188,13 @@ public class RobotContainer {
         climber = new Climber(new ClimberIOSim());
         intake =
             new Intake(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.ROLLERS),
-                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.getGains()));
+                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.Rollers.SPECS),
+                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.SYSTEM_CONSTANTS));
 
         serializer =
             new Serializer(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 5, SerializerConstants.ROLLERS));
+                new RollersIOSim(
+                    DCMotor.getKrakenX60(1), 5, IndexerConstants.Serializer.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -213,9 +212,10 @@ public class RobotContainer {
                     () -> drive.getPose()));
         turret =
             new Turret(
-                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.getConstants()));
+                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.SYSTEM_CONSTANTS));
         hood =
-            new Hood(new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.getConstants()));
+            new Hood(
+                new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
         flywheel = new Flywheel(new FlywheelIOSim());
 
         break;

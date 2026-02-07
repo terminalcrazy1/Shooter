@@ -35,7 +35,7 @@ public class RollersIOTalonFX implements RollersIO {
   private final StatusSignal<Current> torqueCurrent;
 
   @SuppressWarnings("removal")
-  public RollersIOTalonFX(int canId, String canBus, RollersConstants constants) {
+  public RollersIOTalonFX(int canId, String canBus, RollersSpecifications constants) {
 
     talon = new TalonFX(canId, canBus);
 

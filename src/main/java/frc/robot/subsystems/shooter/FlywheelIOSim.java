@@ -6,7 +6,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants.ControlSystemContext;
+import frc.robot.Constants.ControlSystemConstants;
 
 public class FlywheelIOSim implements FlywheelIO {
   private final DCMotorSim sim;
@@ -18,16 +18,16 @@ public class FlywheelIOSim implements FlywheelIO {
   private PIDController feedback;
 
   public FlywheelIOSim() {
-    ControlSystemContext baseGains = ShooterConstants.Flywheel.getConstants();
+    ControlSystemConstants constants = ShooterConstants.Flywheel.SYSTEM_CONSTANTS;
 
     sim =
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(baseGains.kV(), baseGains.kA()),
+            LinearSystemId.createDCMotorSystem(constants.kV, constants.kA),
             DCMotor.getKrakenX60(2));
 
-    feedforward = new SimpleMotorFeedforward(baseGains.kS(), baseGains.kV());
+    feedforward = new SimpleMotorFeedforward(constants.kS, constants.kV);
 
-    feedback = new PIDController(baseGains.kP(), 0.0, baseGains.kD());
+    feedback = new PIDController(constants.kP, 0.0, constants.kD);
   }
 
   @Override

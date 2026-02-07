@@ -13,23 +13,25 @@ public class Climber extends SubsystemBase {
   private final ClimberIOInputsAutoLogged climberIOInputs = new ClimberIOInputsAutoLogged();
 
   private final LoggedTunableNumber kG =
-      new LoggedTunableNumber("Climber/kG", ClimberConstants.getConstants().kG());
+      new LoggedTunableNumber("Climber/kG", ClimberConstants.SYSTEM_CONSTANTS.kG);
   private final LoggedTunableNumber kS =
-      new LoggedTunableNumber("Climber/kS", ClimberConstants.getConstants().kS());
+      new LoggedTunableNumber("Climber/kS", ClimberConstants.SYSTEM_CONSTANTS.kS);
   private final LoggedTunableNumber kV =
-      new LoggedTunableNumber("Climber/kV", ClimberConstants.getConstants().kV());
+      new LoggedTunableNumber("Climber/kV", ClimberConstants.SYSTEM_CONSTANTS.kV);
   private final LoggedTunableNumber kA =
-      new LoggedTunableNumber("Climber/kA", ClimberConstants.getConstants().kA());
+      new LoggedTunableNumber("Climber/kA", ClimberConstants.SYSTEM_CONSTANTS.kA);
 
   private final LoggedTunableNumber kP =
-      new LoggedTunableNumber("Climber/kP", ClimberConstants.getConstants().kP());
+      new LoggedTunableNumber("Climber/kP", ClimberConstants.SYSTEM_CONSTANTS.kP);
   private final LoggedTunableNumber kD =
-      new LoggedTunableNumber("Climber/kD", ClimberConstants.getConstants().kD());
+      new LoggedTunableNumber("Climber/kD", ClimberConstants.SYSTEM_CONSTANTS.kD);
 
   private Distance target = Meters.of(0);
 
   public Climber(ClimberIO climberIO) {
     this.climberIO = climberIO;
+
+    climberIO.setControlGains(kG.get(), kS.get(), kV.get(), kA.get(), kP.get(), kD.get());
   }
 
   public Command setPosition(Distance positionTarget) {

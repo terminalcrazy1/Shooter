@@ -40,25 +40,36 @@ public final class Constants {
       Optional<Double> maxAcceleration) {}
 
   public static class ControlSystemConstants {
-    public static final ControlSystemContext EMPTY_GAINS =
+    public static final ControlSystemContext EMPTY_CONTEXT =
         new ControlSystemContext(0, 0, 0, 0, 0, 0, Optional.empty(), Optional.empty());
-    private final ControlSystemContext rModeGains;
-    private final ControlSystemContext sModeGains;
+    public final ControlSystemContext REAL_CONTEXT;
+    public final ControlSystemContext SIM_CONTEXT;
 
-    public ControlSystemConstants(ControlSystemContext realGains, ControlSystemContext simGains) {
-      rModeGains = realGains;
-      sModeGains = simGains;
-    }
+    public final double kV;
+    public final double kA;
+    public final double kS;
+    public final double kG;
+    public final double kP;
+    public final double kD;
+    public final Optional<Double> maxVelocity;
+    public final Optional<Double> maxAcceleration;
 
-    public ControlSystemContext getConstants() {
-      switch (currentMode) {
-        case REAL:
-          return rModeGains;
-        case SIM:
-          return sModeGains;
-        default:
-          return EMPTY_GAINS;
-      }
+    public ControlSystemConstants(
+        ControlSystemContext realContext, ControlSystemContext simContext) {
+      REAL_CONTEXT = realContext;
+      SIM_CONTEXT = simContext;
+
+      ControlSystemContext context = (currentMode.equals(Mode.REAL)) ? realContext : simContext;
+
+      kV = context.kV();
+      kA = context.kA();
+      kS = context.kS();
+      kG = context.kG();
+      kP = context.kP();
+      kD = context.kD();
+
+      maxVelocity = context.maxVelocity();
+      maxAcceleration = context.maxAcceleration();
     }
   }
 }

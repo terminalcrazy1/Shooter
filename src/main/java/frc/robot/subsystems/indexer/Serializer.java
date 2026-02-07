@@ -1,0 +1,32 @@
+package frc.robot.subsystems.indexer;
+
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.util.LoggedTunableNumber;
+
+public class Serializer extends Rollers {
+  private final LoggedTunableNumber kS =
+      new LoggedTunableNumber("Serializer/kS", IndexerConstants.Serializer.SYSTEM_CONSTANTS.kS);
+  private final LoggedTunableNumber kV =
+      new LoggedTunableNumber("Serializer/kV", IndexerConstants.Serializer.SYSTEM_CONSTANTS.kV);
+  private final LoggedTunableNumber kP =
+      new LoggedTunableNumber("Serializer/kP", IndexerConstants.Serializer.SYSTEM_CONSTANTS.kP);
+  private final LoggedTunableNumber kD =
+      new LoggedTunableNumber("Serializer/kD", IndexerConstants.Serializer.SYSTEM_CONSTANTS.kD);
+
+  public Serializer(RollersIO io) {
+    super("Serializer", io);
+
+    io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
+  }
+
+  @Override
+  public void periodic() {
+    int id = hashCode();
+
+    LoggedTunableNumber.ifChanged(
+        id, c -> getIO().setControlConstants(c[0], c[1], c[2], c[3]), kS, kV, kP, kD);
+
+    super.periodic();
+  }
+}
