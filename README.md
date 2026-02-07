@@ -6,7 +6,7 @@ Code for the 2026 FRC season
 
 * Drivetrain (CANivore):
   * FrontLeft
-    * Encoder = 1 
+    * Encoder = 1
     * Drive = 2
     * Steer = 3
   * FrontRight
