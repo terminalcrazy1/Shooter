@@ -38,7 +38,7 @@ public class FieldConstants {
   // Scoring element positions
   public static final Pose2d allianceHubPose =
       new Pose2d(
-          Units.inchesToMeters(181.56),
+          Units.inchesToMeters(182.11),
           fieldWidth / 2.0,
           Rotation2d.fromDegrees(180)); // Towards origin
 
