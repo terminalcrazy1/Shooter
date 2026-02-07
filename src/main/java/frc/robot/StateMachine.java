@@ -22,9 +22,6 @@ public class StateMachine<State extends Enum<State>> {
     ALREADY_SET
   }
 
-  /** The class of the Enum */
-  public final Class<State> EnumClass;
-
   /** A trigger for when each state is entered */
   public final Map<State, Trigger> stateTriggers;
 
@@ -37,13 +34,12 @@ public class StateMachine<State extends Enum<State>> {
   public static final BooleanSupplier STATE_ALWAYS_AVAILABLE = () -> true;
 
   public StateMachine(State initialState) {
-    this.EnumClass = initialState.getDeclaringClass();
     this.currentState = initialState;
 
     Map<State, Trigger> modifiableStateTriggers = new HashMap<>();
 
     // Initialize state triggers
-    for (State state : EnumClass.getEnumConstants()) {
+    for (State state : initialState.getDeclaringClass().getEnumConstants()) {
       modifiableStateTriggers.put(state, new Trigger(() -> this.currentState.equals(state)));
     }
 
