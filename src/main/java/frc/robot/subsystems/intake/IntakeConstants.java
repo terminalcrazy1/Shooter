@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
+import frc.robot.subsystems.pivot.PivotSpecifications;
 import frc.robot.subsystems.rollers.RollersSpecifications;
 import java.util.Optional;
 
@@ -27,7 +28,6 @@ public final class IntakeConstants {
     public static final int CAN_ID = 17;
     public static final int PIVOT_CANCODER_ID = 18;
 
-    public static final boolean MOTOR_CLOCKWISE_POSITIVE = true;
     public static final boolean CANCODER_CLOCKWISE_POSITIVE = true;
 
     public static final double CANCODER_GEAR_RATIO = 1.0;
@@ -45,6 +45,8 @@ public final class IntakeConstants {
                 0.4,
                 Optional.of(5.0),
                 Optional.of(20.0)));
+
+    public static final PivotSpecifications SPECS = new PivotSpecifications(1.0, true);
   }
 
   private IntakeConstants() {}

@@ -42,7 +42,6 @@ import frc.robot.subsystems.intake.SlapdownIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
-import frc.robot.subsystems.pivot.PivotIOTalonFX.PivotTalonFXConstants;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
@@ -142,7 +141,7 @@ public class RobotContainer {
                 new SlapdownIOTalonFX(
                     IntakeConstants.Pivot.CAN_ID,
                     IntakeConstants.CANBUS,
-                    new PivotTalonFXConstants(false, 1)));
+                    IntakeConstants.Pivot.SPECS));
 
         serializer =
             new Serializer(
@@ -164,14 +163,14 @@ public class RobotContainer {
             new Turret(
                 new PivotIOTalonFX(
                     ShooterConstants.Turret.CAN_ID,
-                    ShooterConstants.Turret.CANBUS,
-                    new PivotTalonFXConstants(false, ShooterConstants.Turret.GEAR_RATIO)));
+                    ShooterConstants.CANBUS,
+                    ShooterConstants.Turret.SPECS));
         hood =
             new Hood(
                 new PivotIOTalonFX(
                     ShooterConstants.Hood.CAN_ID,
-                    ShooterConstants.Hood.CANBUS,
-                    new PivotTalonFXConstants(false, ShooterConstants.Hood.GEAR_RATIO)));
+                    ShooterConstants.CANBUS,
+                    ShooterConstants.Hood.SPECS));
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         break;
 

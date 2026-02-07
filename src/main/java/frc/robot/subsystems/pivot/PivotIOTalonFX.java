@@ -37,19 +37,17 @@ public class PivotIOTalonFX implements PivotIO {
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-  public record PivotTalonFXConstants(boolean clockwisePositive, double gearRatio) {}
-
-  public PivotIOTalonFX(int canId, String canBus, PivotTalonFXConstants constants) {
+  public PivotIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     motor = new TalonFX(canId, canBus);
 
     motorConfig.MotorOutput.Inverted =
-        constants.clockwisePositive
+        constants.clockwisePositive()
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio;
+    motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio();
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(motorConfig));
 

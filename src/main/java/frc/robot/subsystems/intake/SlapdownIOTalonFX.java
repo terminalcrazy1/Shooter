@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.pivot.PivotSpecifications;
 
 public class SlapdownIOTalonFX extends PivotIOTalonFX {
   private final CANcoder cancoder;
@@ -17,7 +18,7 @@ public class SlapdownIOTalonFX extends PivotIOTalonFX {
 
   private final double cancoderToMechanismRatio;
 
-  public SlapdownIOTalonFX(int canId, String canBus, PivotTalonFXConstants constants) {
+  public SlapdownIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     super(canId, canBus, constants);
 
     cancoder = new CANcoder(IntakeConstants.Pivot.PIVOT_CANCODER_ID, canBus);
