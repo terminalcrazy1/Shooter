@@ -14,11 +14,7 @@ public final class IntakeConstants {
     public static final int CAN_ID = 14;
 
     public static final RollersSpecifications SPECS =
-        new RollersSpecifications(
-            16.0 / 24.0,
-            false,
-            40,
-            Units.inchesToMeters(1.0));
+        new RollersSpecifications(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
   }
 
   public static final class Pivot {
@@ -35,11 +31,11 @@ public final class IntakeConstants {
         new ControlSystemConstants(
             ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
-                0.12,  // kS
-                0.05,  // kV
-                0.0,   // kA
-                0.0,   // kP
-                1.0,   // kD
+                0.12, // kS
+                0.05, // kV
+                0.0, // kA
+                0.0, // kP
+                1.0, // kD
                 0.4,
                 Optional.of(5.0),
                 Optional.of(20.0)));
