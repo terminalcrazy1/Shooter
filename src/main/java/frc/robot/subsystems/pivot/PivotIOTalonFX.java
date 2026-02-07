@@ -37,6 +37,7 @@ public class PivotIOTalonFX implements PivotIO {
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
+  @SuppressWarnings("removal")
   public PivotIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     motor = new TalonFX(canId, canBus);
 

@@ -50,10 +50,8 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   @SuppressWarnings("removal")
   public FlywheelIOTalonFX() {
-    masterMotor =
-        new TalonFX(ShooterConstants.Flywheel.MASTER_CAN_ID, ShooterConstants.CANBUS);
-    followerMotor =
-        new TalonFX(ShooterConstants.Flywheel.FOLLOWER_CAN_ID, ShooterConstants.CANBUS);
+    masterMotor = new TalonFX(ShooterConstants.Flywheel.MASTER_CAN_ID, ShooterConstants.CANBUS);
+    followerMotor = new TalonFX(ShooterConstants.Flywheel.FOLLOWER_CAN_ID, ShooterConstants.CANBUS);
     followerMotor.setControl(new Follower(masterMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
     ControlSystemConstants constants = ShooterConstants.Flywheel.SYSTEM_CONSTANTS;

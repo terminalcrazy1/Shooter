@@ -18,6 +18,7 @@ public class SlapdownIOTalonFX extends PivotIOTalonFX {
 
   private final double cancoderToMechanismRatio;
 
+  @SuppressWarnings("removal")
   public SlapdownIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
     super(canId, canBus, constants);
 

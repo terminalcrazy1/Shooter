@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public final class ShooterConstants {
   public static final String CANBUS = "rio";
-  
+
   public static final class Flywheel {
     public static final int MASTER_CAN_ID = 0;
     public static final int FOLLOWER_CAN_ID = 1;

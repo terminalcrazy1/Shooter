@@ -36,6 +36,7 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
+  @SuppressWarnings("removal")
   public ClimberIOTalonFX() {
     motor = new TalonFX(ClimberConstants.CAN_ID, ClimberConstants.CANBUS);
 
