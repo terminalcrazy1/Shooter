@@ -39,6 +39,7 @@ import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.SlapdownIOTalonFX;
+import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
@@ -75,6 +76,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Serializer serializer;
   private final Vision vision;
+  private final LEDs leds;
 
   private final Turret turret;
   private final Hood hood;
@@ -172,6 +174,8 @@ public class RobotContainer {
                     ShooterConstants.CANBUS,
                     ShooterConstants.Hood.SPECS));
         flywheel = new Flywheel(new FlywheelIOTalonFX());
+
+        leds = new LEDs();
         break;
 
       case SIM:
@@ -218,6 +222,7 @@ public class RobotContainer {
                 new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
         flywheel = new Flywheel(new FlywheelIOSim());
 
+        leds = new LEDs();
         break;
 
       default:
@@ -240,7 +245,7 @@ public class RobotContainer {
         hood = new Hood(new PivotIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         serializer = new Serializer(new RollersIO() {});
-
+        leds = new LEDs();
         break;
     }
     NamedCommands.registerCommand("StowIntake", intake.pivot.setTargetAngle(Degrees.of(0)));
