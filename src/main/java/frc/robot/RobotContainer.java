@@ -195,7 +195,10 @@ public class RobotContainer {
         climber = new Climber(new ClimberIOSim());
         intake =
             new Intake(
-                new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.Rollers.SPECS),
+                new RollersIOSim(
+                    DCMotor.getKrakenX60(1),
+                    IntakeConstants.Rollers.SYSTEM_CONSTANTS,
+                    IntakeConstants.Rollers.SPECS),
                 new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.SYSTEM_CONSTANTS));
 
         serializer =

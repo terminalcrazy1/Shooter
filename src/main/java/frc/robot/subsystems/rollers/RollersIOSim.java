@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.Constants.ControlSystemConstants;
 
 public class RollersIOSim implements RollersIO {
 
@@ -24,6 +25,13 @@ public class RollersIOSim implements RollersIO {
     sim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(motor, moi, 1 / specs.gearRatio()), motor);
+  }
+
+  public RollersIOSim(
+      DCMotor motor, ControlSystemConstants constants, RollersSpecifications specs) {
+    this.specs = specs;
+
+    sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(constants.kV, constants.kA), motor);
   }
 
   @Override
