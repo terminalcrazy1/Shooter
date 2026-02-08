@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,9 +13,12 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.BallTunneler;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Hood;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Turret;
+import frc.robot.util.ShootingUtil;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -114,26 +118,15 @@ public class Superstructure extends SubsystemBase {
         .get(ShootingState.IDLE)
         .whileFalse( // When the shooting state isn't idle,
             turret.lockOntoTarget( // Have the turret track the target
-                () -> {
-                  Pose2d drivePose = this.drive.getPose();
-                  Rotation2d driveHeading = drivePose.getRotation();
-                  Translation2d driveToHubVector =
-                      hubPoseSupplier.get().getTranslation().minus(drivePose.getTranslation());
-                  Rotation2d pointToHubRotation =
-                      new Rotation2d(driveToHubVector.getX(), driveToHubVector.getY());
-
-                  return pointToHubRotation.minus(driveHeading).getMeasure();
-                },
+                () -> ShootingUtil.calculateTurretRelativeAngle(drive::getPose, hubPoseSupplier),
                 () -> drive.getAngularVelocityRadPerSec()))
         .whileFalse( // Have the hood track the target
             hood.trackTarget(
-                () ->
-                    Radians.of(
-                        hubPoseSupplier
-                            .get()
-                            .getTranslation()
-                            .getDistance(drive.getPose().getTranslation()))))
-        .whileFalse(flywheel.runVelocityRadPerSec(5.0)); // Spin up the flywheels
+                () -> ShootingUtil.calculateHoodAngle(hubPoseSupplier, drive::getPose)))
+        .whileFalse(
+            flywheel.runVelocityRadPerSec(
+                ShooterConstants.Flywheel.SHOOTING_SPEED.in(
+                    RadiansPerSecond))); // Spin up the flywheels
 
     shootingStateMachine
         .stateTriggers
@@ -165,14 +158,20 @@ public class Superstructure extends SubsystemBase {
     intakingStateMachine
         .stateTriggers
         .get(IntakingState.INTAKING)
-        .whileTrue( // Run the intake based on drivetrain speed (minimum of 1 m/s)
-            intake.runLinearVelocity(() -> Math.max(drive.getLinearSpeedMetersPerSec() / 10, 1.0)));
+        .whileTrue( // Run the intake based on drivetrain speed
+            intake.runLinearVelocity(
+                () ->
+                    Math.max(
+                        drive.getLinearSpeedMetersPerSec()
+                            * IntakeConstants.Rollers.DRIVETRAIN_TO_INTAKE_SPEED_FACTOR,
+                        IntakeConstants.Rollers.MINIMUM_INTAKE_SPEED.in(MetersPerSecond))));
 
     shootingStateMachine
         .stateTriggers
         .get(ShootingState.IDLE)
         .and(intakingStateMachine.stateTriggers.get(IntakingState.INTAKING).negate())
-        // While we are running the shooter in anyway (not Idle), or while we are running the intake rollers
+        // While we are running the shooter in anyway (not Idle), or while we are running the intake
+        // rollers
         .whileFalse(serializer.runSerializer());
   }
 

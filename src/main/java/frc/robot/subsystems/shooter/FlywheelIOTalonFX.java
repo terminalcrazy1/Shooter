@@ -57,7 +57,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     ControlSystemConstants constants = ShooterConstants.Flywheel.SYSTEM_CONSTANTS;
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     config.Feedback.SensorToMechanismRatio = ShooterConstants.Flywheel.GEAR_RATIO;
 

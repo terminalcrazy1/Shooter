@@ -25,7 +25,9 @@ public class Serializer extends Rollers {
 
   public Command runSerializer() {
     return runEnd(
-        () -> io.setAngularVelocity(IndexerConstants.Serializer.SPIN_SPEED.in(RadiansPerSecond)),
+        () ->
+            io.setAngularVelocity(
+                IndexerConstants.Serializer.SPINDEXING_SPEED.in(RadiansPerSecond)),
         () -> io.stop());
   }
 

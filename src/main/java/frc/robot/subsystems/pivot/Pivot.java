@@ -23,10 +23,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public Command setTargetAngle(Angle target) {
-    return this.runOnce(
-        () -> {
-          io.setPosition(target.in(Radians));
-        });
+    return this.runOnce(() -> io.setPosition(target.in(Radians)));
   }
 
   public Angle getOrientation() {

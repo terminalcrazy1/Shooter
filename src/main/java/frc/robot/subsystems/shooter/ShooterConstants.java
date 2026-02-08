@@ -1,5 +1,9 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
 import frc.robot.subsystems.pivot.PivotSpecifications;
@@ -20,6 +24,8 @@ public final class ShooterConstants {
 
     public static final double GEAR_RATIO = 1.0;
     public static final double WHEEL_RADIUS_METERS = 0.1;
+
+    public static final AngularVelocity SHOOTING_SPEED = RadiansPerSecond.of(5.0);
   }
 
   public static final class Turret {
@@ -33,8 +39,8 @@ public final class ShooterConstants {
 
     public static final PivotSpecifications SPECS = new PivotSpecifications(52.0, false);
 
-    public static final double MIN_ANGLE_RADS = -190 * (Math.PI / 180);
-    public static final double MAX_ANGLE_RADS = 190 * (Math.PI / 180);
+    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-190);
+    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(190);
   }
 
   public static final class Hood {
@@ -47,5 +53,8 @@ public final class ShooterConstants {
                 4.44, 0.1, 0.0, 0.0, 1.0, 0.0, Optional.of(1.0), Optional.of(1.0)));
 
     public static final PivotSpecifications SPECS = new PivotSpecifications(1.0, false);
+
+    public static final double MIN_ANGLE_RADS = 0;
+    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(26.5);
   }
 }

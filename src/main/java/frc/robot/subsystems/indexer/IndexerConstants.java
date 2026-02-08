@@ -14,7 +14,7 @@ public final class IndexerConstants {
 
   public static final class Serializer {
     public static final int CAN_ID = 17;
-    public static final AngularVelocity SPIN_SPEED = RotationsPerSecond.of(5);
+    public static final AngularVelocity SPINDEXING_SPEED = RotationsPerSecond.of(5);
 
     public static final RollersSpecifications ROLLERS_SPECS =
         new RollersSpecifications(5, true, 40, Units.inchesToMeters(8));

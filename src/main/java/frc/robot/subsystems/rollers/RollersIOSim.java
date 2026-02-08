@@ -21,14 +21,16 @@ public class RollersIOSim implements RollersIO {
   public RollersIOSim(DCMotor motor, double moi, RollersSpecifications specs) {
     this.specs = specs;
 
-    sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moi, specs.gearRatio()), motor);
+    sim =
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(motor, moi, 1 / specs.gearRatio()), motor);
   }
 
   @Override
   public void updateInputs(RollersIOInputsAutoLogged inputs) {
     sim.update(0.02);
 
-    double motorTargetVel = targetVelocityRadPerSec / specs.gearRatio();
+    double motorTargetVel = targetVelocityRadPerSec * specs.gearRatio();
     double ffVolts = feedforward.calculate(motorTargetVel);
     double fbVolts = feedback.calculate(sim.getAngularVelocityRadPerSec(), motorTargetVel);
 

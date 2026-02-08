@@ -1,9 +1,11 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
 import frc.robot.subsystems.pivot.PivotSpecifications;
@@ -25,6 +27,9 @@ public final class IntakeConstants {
 
     public static final RollersSpecifications SPECS =
         new RollersSpecifications(16.0 / 24.0, false, 40, Units.inchesToMeters(1.0));
+
+    public static final LinearVelocity MINIMUM_INTAKE_SPEED = MetersPerSecond.of(1.0);
+    public static final double DRIVETRAIN_TO_INTAKE_SPEED_FACTOR = 2;
   }
 
   public static final class Pivot {
