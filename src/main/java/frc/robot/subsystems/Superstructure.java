@@ -19,18 +19,29 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
+  /** The state in regards to shooting */
   public static enum ShootingState {
+    /** Requestable: Completely idle */
     IDLE,
+    /** Requestable: Start running flywheels and tracking target */
     READYING_SHOOTER,
+    /** Intermediate & Requestable: Flywheels are at correct speed, still tracking target */
     READY_TO_SHOOT,
+    /** Requestable: Run ball tunneler to start shooting, still tracking target */
     SHOOTING
   }
 
+  /** The state in regards to intaking */
   public static enum IntakingState {
+    /** Intermediate: The intake is stowed */
     STOWED,
+    /** Requestable: The intake is currently being stowed */
     STOWING,
+    /** Requestable: The intake is currently beind deployed */
     DEPLOYING,
+    /** Intermediate & Requestable: The intake is deployed and ready to start intaking */
     INTAKE_READY,
+    /** Requestable: The intake is currently running */
     INTAKING
   }
 
@@ -95,13 +106,14 @@ public class Superstructure extends SubsystemBase {
 
   /** Configure what the behaviours of each state are */
   private void configureStateBehaviours() {
+    // Stop the flywheels when in Idle shooting state
     shootingStateMachine.stateTriggers.get(ShootingState.IDLE).onTrue(flywheel.stop());
 
     shootingStateMachine
         .stateTriggers
         .get(ShootingState.IDLE)
-        .whileFalse(
-            turret.lockOntoTarget(
+        .whileFalse( // When the shooting state isn't idle,
+            turret.lockOntoTarget( // Have the turret track the target
                 () -> {
                   Pose2d drivePose = this.drive.getPose();
                   Rotation2d driveHeading = drivePose.getRotation();
@@ -113,7 +125,7 @@ public class Superstructure extends SubsystemBase {
                   return pointToHubRotation.minus(driveHeading).getMeasure();
                 },
                 () -> drive.getAngularVelocityRadPerSec()))
-        .whileFalse(
+        .whileFalse( // Have the hood track the target
             hood.trackTarget(
                 () ->
                     Radians.of(
@@ -121,13 +133,13 @@ public class Superstructure extends SubsystemBase {
                             .get()
                             .getTranslation()
                             .getDistance(drive.getPose().getTranslation()))))
-        .whileFalse(flywheel.runVelocityRadPerSec(5.0));
+        .whileFalse(flywheel.runVelocityRadPerSec(5.0)); // Spin up the flywheels
 
     shootingStateMachine
         .stateTriggers
-        .get(ShootingState.READYING_SHOOTER)
-        .and(flywheel.atTargetVelocity())
-        .onTrue(forceState(ShootingState.READY_TO_SHOOT));
+        .get(ShootingState.READYING_SHOOTER) // When the flywheels are getting spun up
+        .and(flywheel.atTargetVelocity()) // And they are at their target velocity
+        .onTrue(forceState(ShootingState.READY_TO_SHOOT)); // then we are ready to shoot
 
     shootingStateMachine
         .stateTriggers
@@ -138,28 +150,29 @@ public class Superstructure extends SubsystemBase {
     intakingStateMachine
         .stateTriggers
         .get(IntakingState.STOWING)
-        .onTrue(intake.stow())
-        .and(intake.pivotAtSetpoint())
-        .onTrue(forceState(IntakingState.STOWED));
+        .onTrue(intake.stow()) // Stow the intake
+        .and(intake.pivotAtSetpoint()) // If the intake is stowed,
+        .onTrue(forceState(IntakingState.STOWED)); // move to appropriate state
 
     intakingStateMachine.stateTriggers.get(IntakingState.DEPLOYING).onTrue(intake.deploy());
 
     intakingStateMachine
         .stateTriggers
-        .get(IntakingState.DEPLOYING)
-        .and(intake.pivotAtSetpoint())
-        .onTrue(forceState(IntakingState.INTAKE_READY));
+        .get(IntakingState.DEPLOYING) // Deploy the intake
+        .and(intake.pivotAtSetpoint()) // If the intake arm is deployed,
+        .onTrue(forceState(IntakingState.INTAKE_READY)); // Move to appropriate state
 
     intakingStateMachine
         .stateTriggers
         .get(IntakingState.INTAKING)
-        .whileTrue(
+        .whileTrue( // Run the intake based on drivetrain speed (minimum of 1 m/s)
             intake.runLinearVelocity(() -> Math.max(drive.getLinearSpeedMetersPerSec() / 10, 1.0)));
 
     shootingStateMachine
         .stateTriggers
         .get(ShootingState.IDLE)
         .and(intakingStateMachine.stateTriggers.get(IntakingState.INTAKING).negate())
+        // While we are running the shooter in anyway (not Idle), or while we are running the intake rollers
         .whileFalse(serializer.runSerializer());
   }
 
