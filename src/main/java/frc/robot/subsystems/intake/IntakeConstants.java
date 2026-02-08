@@ -48,14 +48,7 @@ public final class IntakeConstants {
         new ControlSystemConstants(
             ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
-                0.12, // kS
-                0.05, // kV
-                0.0, // kA
-                0.0, // kP
-                1.0, // kD
-                0.4,
-                Optional.of(5.0),
-                Optional.of(20.0)));
+                0.12, 0.05, 0.0, 0.0, 1.0, 0.4, Optional.of(5.0), Optional.of(20.0)));
 
     public static final PivotSpecifications SPECS = new PivotSpecifications(1.0, true);
   }

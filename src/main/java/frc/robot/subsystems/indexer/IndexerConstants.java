@@ -23,7 +23,7 @@ public final class IndexerConstants {
         new ControlSystemConstants(
             ControlSystemConstants.EMPTY_CONTEXT,
             new ControlSystemContext(
-                0.01, 0.01, 0.15, 0.0, 5.0, 0.0, Optional.empty(), Optional.empty()));
+                2.5, 5.0, 0.15, 0.0, 5.0, 0.0, Optional.empty(), Optional.empty()));
   }
 
   public static final class BallTunneler {
@@ -35,7 +35,9 @@ public final class IndexerConstants {
 
     public static final ControlSystemConstants SYSTEM_CONSTANTS =
         new ControlSystemConstants(
-            ControlSystemConstants.EMPTY_CONTEXT, Serializer.SYSTEM_CONSTANTS.SIM_CONTEXT);
+            ControlSystemConstants.EMPTY_CONTEXT,
+            new ControlSystemContext(
+                0.12, 0.01, 0.05, 0.0, 0.5, 0.0, Optional.empty(), Optional.empty()));
   }
 
   private IndexerConstants() {}

@@ -204,11 +204,15 @@ public class RobotContainer {
         serializer =
             new Serializer(
                 new RollersIOSim(
-                    DCMotor.getKrakenX60(1), 5, IndexerConstants.Serializer.ROLLERS_SPECS));
+                    DCMotor.getKrakenX60(1),
+                    IndexerConstants.Serializer.SYSTEM_CONSTANTS,
+                    IndexerConstants.Serializer.ROLLERS_SPECS));
         ballTunneler =
             new BallTunneler(
                 new RollersIOSim(
-                    DCMotor.getKrakenX44(1), 1, IndexerConstants.BallTunneler.ROLLERS_SPECS));
+                    DCMotor.getKrakenX44(1),
+                    IndexerConstants.BallTunneler.SYSTEM_CONSTANTS,
+                    IndexerConstants.BallTunneler.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
