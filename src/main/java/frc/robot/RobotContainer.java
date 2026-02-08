@@ -196,10 +196,7 @@ public class RobotContainer {
         intake =
             new Intake(
                 new RollersIOSim(DCMotor.getKrakenX60(1), 1, IntakeConstants.Rollers.SPECS),
-                new PivotIOSim(
-                    DCMotor.getKrakenX60(1),
-                    IntakeConstants.Pivot.SYSTEM_CONSTANTS,
-                    IntakeConstants.Pivot.SPECS));
+                new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.SYSTEM_CONSTANTS));
 
         serializer =
             new Serializer(
@@ -226,16 +223,10 @@ public class RobotContainer {
                     () -> drive.getPose()));
         turret =
             new Turret(
-                new PivotIOSim(
-                    DCMotor.getKrakenX60(1),
-                    ShooterConstants.Turret.SYSTEM_CONSTANTS,
-                    ShooterConstants.Turret.SPECS));
+                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.SYSTEM_CONSTANTS));
         hood =
             new Hood(
-                new PivotIOSim(
-                    DCMotor.getKrakenX44(1),
-                    ShooterConstants.Hood.SYSTEM_CONSTANTS,
-                    ShooterConstants.Hood.SPECS));
+                new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
         flywheel = new Flywheel(new FlywheelIOSim());
 
         break;

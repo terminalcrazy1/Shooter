@@ -21,7 +21,7 @@ public class ComponentPoseUtil {
     // Serializer
     poses[0] =
         rollers != null
-            ? new Pose3d(new Translation3d(), new Rotation3d(0, 0, rollers.getPositionRads()))
+            ? new Pose3d(new Translation3d(), new Rotation3d(0, 0, -rollers.getPositionRads()))
             : new Pose3d();
 
     // Turret
@@ -36,7 +36,7 @@ public class ComponentPoseUtil {
         intakePivot != null && intakePivot.getOrientation() != null
             ? new Pose3d(
                 new Translation3d(-0.31, 0, 0.21),
-                new Rotation3d(0, intakePivot.getOrientation().in(Radians), 0))
+                new Rotation3d(0, -intakePivot.getOrientation().in(Radians), 0))
             : new Pose3d();
 
     // Climber

@@ -15,15 +15,13 @@ public class PivotIOSim implements PivotIO {
   private boolean voltageOverridesTarget = false;
   private double extraOmegaRadPerSec = 0.0;
 
-  private final PivotSpecifications specs;
   private final DCMotorSim motorSim;
 
   private final SimpleMotorFeedforward feedforwardController = new SimpleMotorFeedforward(0.0, 0.0);
   private final ProfiledPIDController pidController =
       new ProfiledPIDController(0, 0, 0, new Constraints(0.0, 0.0));
 
-  public PivotIOSim(DCMotor motor, ControlSystemConstants constants, PivotSpecifications specs) {
-    this.specs = specs;
+  public PivotIOSim(DCMotor motor, ControlSystemConstants constants) {
     this.motorSim =
         new DCMotorSim(LinearSystemId.createDCMotorSystem(constants.kV, constants.kA), motor);
 
@@ -79,10 +77,8 @@ public class PivotIOSim implements PivotIO {
     inputs.statorCurrentAmps = inputs.supplyCurrentAmps;
     inputs.torqueCurrent = inputs.supplyCurrentAmps;
     inputs.velocityRadsPerSec = this.motorSim.getAngularVelocityRadPerSec();
-
-    double inversionFactor = specs.clockwisePositive() ? -1.0 : 1.0;
-    inputs.targetPositionRads = inversionFactor * targetAngleRads;
-    inputs.positionRads = inversionFactor * this.motorSim.getAngularPositionRad();
+    inputs.targetPositionRads = targetAngleRads;
+    inputs.positionRads = this.motorSim.getAngularPositionRad();
   }
 
   @Override

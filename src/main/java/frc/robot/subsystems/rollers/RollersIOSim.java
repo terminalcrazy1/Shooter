@@ -29,7 +29,6 @@ public class RollersIOSim implements RollersIO {
     sim.update(0.02);
 
     double motorTargetVel = targetVelocityRadPerSec / specs.gearRatio();
-    motorTargetVel *= specs.inverted() ? -1.0 : 1.0;
     double ffVolts = feedforward.calculate(motorTargetVel);
     double fbVolts = feedback.calculate(sim.getAngularVelocityRadPerSec(), motorTargetVel);
 
