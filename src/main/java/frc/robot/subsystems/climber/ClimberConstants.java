@@ -8,7 +8,7 @@ import frc.robot.Constants.ControlSystemContext;
 import java.util.Optional;
 
 public final class ClimberConstants {
-  public static final int CAN_ID = 23;
+  public static final int CAN_ID = 24;
   public static final String CANBUS = "rio";
 
   public static final Distance retractedPosition = Inches.of(0);

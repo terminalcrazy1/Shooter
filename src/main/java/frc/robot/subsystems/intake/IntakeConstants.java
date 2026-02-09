@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.Constants.ControlSystemConstants;
 import frc.robot.Constants.ControlSystemContext;
+import frc.robot.subsystems.pivot.CANcoderSpecifications;
 import frc.robot.subsystems.pivot.PivotSpecifications;
 import frc.robot.subsystems.rollers.RollersSpecifications;
 import java.util.Optional;
@@ -36,11 +37,6 @@ public final class IntakeConstants {
     public static final int MOTOR_CAN_ID = 15;
     public static final int CANCODER_ID = 16;
 
-    public static final boolean CANCODER_CLOCKWISE_POSITIVE = true;
-
-    public static final double CANCODER_GEAR_RATIO = 1.0;
-    public static final double CANCODER_OFFSET_RAD = 0.0;
-
     public static final Angle STOWED_ANGLE = Degrees.zero();
     public static final Angle DEPLOYED_ANGLE = Degrees.of(90);
 
@@ -50,7 +46,9 @@ public final class IntakeConstants {
             new ControlSystemContext(
                 0.12, 0.05, 0.0, 0.0, 1.0, 0.4, Optional.of(5.0), Optional.of(20.0)));
 
-    public static final PivotSpecifications SPECS = new PivotSpecifications(1.0, true);
+    public static final PivotSpecifications PIVOT_SPECS = new PivotSpecifications(1.0, true);
+    public static final CANcoderSpecifications CANCODER_SPECS =
+        new CANcoderSpecifications(1.0, 0.0, true);
   }
 
   private IntakeConstants() {}

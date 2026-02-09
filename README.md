@@ -32,7 +32,8 @@ Code for the 2026 FRC season
 * Shooter (CANivore):
   * FlywheelMain = 19
   * FlyWheelFollower = 20
-  * Turret = 21
-  * Hood = 22
+  * TurretMotor = 21
+  * TurretCANcoder = 22
+  * Hood = 23
 * Climber(rio):
-  * Climber = 23
+  * Climber = 24

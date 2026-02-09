@@ -37,10 +37,10 @@ import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.SlapdownIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import frc.robot.subsystems.pivot.PivotIOTalonFXWithCANcoder;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
@@ -139,10 +139,12 @@ public class RobotContainer {
                     IntakeConstants.Rollers.CAN_ID,
                     IntakeConstants.CANBUS,
                     IntakeConstants.Rollers.SPECS),
-                new SlapdownIOTalonFX(
+                new PivotIOTalonFXWithCANcoder(
                     IntakeConstants.Pivot.MOTOR_CAN_ID,
+                    IntakeConstants.Pivot.CANCODER_ID,
                     IntakeConstants.CANBUS,
-                    IntakeConstants.Pivot.SPECS));
+                    IntakeConstants.Pivot.PIVOT_SPECS,
+                    IntakeConstants.Pivot.CANCODER_SPECS));
 
         serializer =
             new Serializer(
@@ -168,10 +170,12 @@ public class RobotContainer {
 
         turret =
             new Turret(
-                new PivotIOTalonFX(
-                    ShooterConstants.Turret.CAN_ID,
+                new PivotIOTalonFXWithCANcoder(
+                    ShooterConstants.Turret.MOTOR_ID,
+                    ShooterConstants.Turret.CANCODER_ID,
                     ShooterConstants.CANBUS,
-                    ShooterConstants.Turret.SPECS));
+                    ShooterConstants.Turret.PIVOT_SPECS,
+                    ShooterConstants.Turret.CANCODER_SPECS));
         hood =
             new Hood(
                 new PivotIOTalonFX(
