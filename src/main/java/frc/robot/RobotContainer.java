@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.Superstructure.IntakingState;
+import frc.robot.subsystems.Superstructure.ShootingState;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -308,6 +310,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // DRIVE CONTROLLER
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -327,38 +330,68 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // Shooting state reset
-    driverController.a().onTrue(superstructure.requestState(Superstructure.ShootingState.IDLE));
-
-    // Enter shooting mode
+    driverController
+        .y()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> Rotation2d.kZero));
+    driverController
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> Rotation2d.k180deg));
+    driverController
+        .x()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> Rotation2d.kCCW_90deg));
     driverController
         .b()
         .whileTrue(
-            superstructure.continuouslyRequestState(Superstructure.ShootingState.READYING_SHOOTER));
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> Rotation2d.kCW_90deg));
+
+    // Shooting state reset
+    driverController.back().onTrue(superstructure.forceState(ShootingState.IDLE));
+
+    // Toggle bump mode
+    driverController.rightBumper().onTrue(superstructure.toggleBumpMode());
+
+    // Toggle shooting mode
+    driverController.leftBumper().onTrue(superstructure.toggleShootingMode());
 
     // Start shooting and stop when let go
     driverController
         .rightTrigger()
-        .onTrue(superstructure.requestState(Superstructure.ShootingState.SHOOTING))
-        .onFalse(superstructure.requestState(Superstructure.ShootingState.READY_TO_SHOOT));
+        .whileTrue(superstructure.continuouslyRequestState(ShootingState.SHOOTING))
+        .onFalse(superstructure.requestState(ShootingState.READY_TO_SHOOT));
 
-    // Intaking
-    driverController
-        .leftTrigger()
-        .onTrue(superstructure.requestState(Superstructure.IntakingState.INTAKING))
-        .onFalse(superstructure.requestState(Superstructure.IntakingState.INTAKE_READY));
-
-    // Intake Slapdown
-    driverController
-        .leftBumper()
-        .onTrue(superstructure.requestState(Superstructure.IntakingState.DEPLOYING));
-
-    driverController
-        .rightBumper()
-        .onTrue(superstructure.requestState(Superstructure.IntakingState.STOWING));
-
+    // Climb
     driverController.povUp().onTrue(climber.extend());
     driverController.povDown().onTrue(climber.retract());
+
+    // OPERATOR CONTROLLER
+    // State reset
+    operatorController.back().onTrue(superstructure.requestState(IntakingState.STOWED));
+
+    // Intake Slapdown
+    operatorController.a().onTrue(superstructure.toggleIntakeArm());
+
+    // Intake Rollers
+    operatorController.y().onTrue(superstructure.requestState(IntakingState.INTAKING));
+    operatorController.b().onTrue(superstructure.requestState(IntakingState.INTAKE_READY));
   }
 
   /**

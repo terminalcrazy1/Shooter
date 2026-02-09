@@ -7,9 +7,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.StateMachine;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.indexer.BallTunneler;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
@@ -126,7 +128,9 @@ public class Superstructure extends SubsystemBase {
         .whileFalse(
             flywheel.runVelocityRadPerSec(
                 ShooterConstants.Flywheel.SHOOTING_SPEED.in(
-                    RadiansPerSecond))); // Spin up the flywheels
+                    RadiansPerSecond))) // Spin up the flywheels
+        .onTrue(drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts))
+        .onFalse(drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed));
 
     shootingStateMachine
         .stateTriggers
@@ -177,34 +181,74 @@ public class Superstructure extends SubsystemBase {
 
   /** A command that requests a state for the shooting state machine */
   public Command requestState(ShootingState targetState) {
-    return runOnce(() -> shootingStateMachine.requestState(targetState));
+    return shootingStateMachine.requestStateCommand(targetState);
   }
 
   /** A command that requests a state for the intaking state machine */
   public Command requestState(IntakingState targetState) {
-    return runOnce(() -> intakingStateMachine.requestState(targetState));
+    return intakingStateMachine.requestStateCommand(targetState);
   }
 
   /** Continuous requests a state until it is set or this command is interrupted */
   public Command continuouslyRequestState(ShootingState targetState) {
-    return run(() -> shootingStateMachine.requestState(targetState))
-        .until(() -> shootingStateMachine.isInState(targetState));
+    return shootingStateMachine.runRequestStateCommand(targetState);
   }
 
   /** Continuous requests a state until it is set or this command is interrupted */
   public Command continuouslyRequestState(IntakingState targetState) {
-    return run(() -> intakingStateMachine.requestState(targetState))
-        .until(() -> intakingStateMachine.isInState(targetState));
+    return intakingStateMachine.runRequestStateCommand(targetState);
   }
 
   /** A command that forces a state for the shooting state machine */
   public Command forceState(ShootingState targetState) {
-    return runOnce(() -> shootingStateMachine.forceState(targetState));
+    return shootingStateMachine.forceStateCommand(targetState);
   }
 
   /** A command that forces a state for the intaking state machine */
   public Command forceState(IntakingState targetState) {
-    return runOnce(() -> intakingStateMachine.forceState(targetState));
+    return intakingStateMachine.forceStateCommand(targetState);
+  }
+
+  /** Toggles Shooting Mode */
+  public Command toggleShootingMode() {
+    return Commands.runOnce(
+        () -> {
+          if (shootingStateMachine.isInState(ShootingState.IDLE)) {
+            shootingStateMachine.requestState(ShootingState.READYING_SHOOTER);
+          } else {
+            shootingStateMachine.requestState(ShootingState.IDLE);
+          }
+        },
+        shootingStateMachine);
+  }
+
+  public Command toggleBumpMode() {
+    return Commands.runOnce(
+        () -> {
+          if (drive.getMaxLinearSpeed().equals(DriveConstants.bumpModeMaxSpeed)) {
+            if (shootingStateMachine.isInState(ShootingState.IDLE)) {
+              drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts);
+            } else {
+              drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed);
+            }
+          } else {
+            drive.setMaxLinearSpeed(DriveConstants.bumpModeMaxSpeed);
+          }
+        },
+        drive);
+  }
+
+  public Command toggleIntakeArm() {
+    return Commands.runOnce(
+        () -> {
+          if (intakingStateMachine.isInState(IntakingState.STOWING)
+              || intakingStateMachine.isInState(IntakingState.STOWED)) {
+            intakingStateMachine.requestState(IntakingState.DEPLOYING);
+          } else {
+            intakingStateMachine.requestState(IntakingState.STOWING);
+          }
+        },
+        intakingStateMachine);
   }
 
   @Override

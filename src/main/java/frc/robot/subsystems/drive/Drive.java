@@ -33,6 +33,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -117,6 +118,9 @@ public class Drive extends SubsystemBase {
           new Pose2d(
               new Translation2d(Units.inchesToMeters(651.22), Units.inchesToMeters(317.69)),
               Rotation2d.k180deg));
+
+  // For controlling drive speed
+  private LinearVelocity currentMaxSpeed = TunerConstants.kSpeedAt12Volts;
 
   public Drive(
       GyroIO gyroIO,
@@ -374,9 +378,19 @@ public class Drive extends SubsystemBase {
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
+  /** Sets the drivetrain maximum speed */
+  public Command setMaxLinearSpeed(LinearVelocity maxSpeed) {
+    return runOnce(() -> currentMaxSpeed = maxSpeed);
+  }
+
+  /** Returns the maximum linear speed */
+  public LinearVelocity getMaxLinearSpeed() {
+    return currentMaxSpeed;
+  }
+
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    return currentMaxSpeed.in(MetersPerSecond);
   }
 
   /** Returns the maximum angular speed in radians per sec. */

@@ -14,7 +14,6 @@ import frc.robot.subsystems.rollers.RollersSpecifications;
 import java.util.Optional;
 
 public final class IntakeConstants {
-
   public static final String CANBUS = "rio";
 
   public static final class Rollers {
