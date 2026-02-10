@@ -30,6 +30,10 @@ public class Pivot extends SubsystemBase {
     return Radians.of(inputsAutoLogged.positionRads);
   }
 
+  public Angle getTargetOrientation() {
+    return Radians.of(inputsAutoLogged.targetPositionRads);
+  }
+
   public PivotIO getIO() {
     return io;
   }

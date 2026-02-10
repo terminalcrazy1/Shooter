@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
@@ -9,25 +9,28 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.pivot.PivotIOTalonFX;
-import frc.robot.subsystems.pivot.PivotSpecifications;
 
-public class SlapdownIOTalonFX extends PivotIOTalonFX {
+public class PivotIOTalonFXWithCANcoder extends PivotIOTalonFX {
   private final CANcoder cancoder;
   private final StatusSignal<Angle> absolutePositionSignal;
 
   private final double cancoderToMechanismRatio;
 
   @SuppressWarnings("removal")
-  public SlapdownIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
-    super(canId, canBus, constants);
+  public PivotIOTalonFXWithCANcoder(
+      int motorCanId,
+      int cancoderCanId,
+      String canBus,
+      PivotSpecifications pivotSpecs,
+      CANcoderSpecifications CANcoderSpecs) {
+    super(motorCanId, canBus, pivotSpecs);
 
-    cancoder = new CANcoder(IntakeConstants.Pivot.PIVOT_CANCODER_ID, canBus);
+    cancoder = new CANcoder(cancoderCanId, canBus);
 
     CANcoderConfiguration config = new CANcoderConfiguration();
-    config.MagnetSensor.MagnetOffset = IntakeConstants.Pivot.CANCODER_OFFSET_RAD / (2.0 * Math.PI);
+    config.MagnetSensor.MagnetOffset = CANcoderSpecs.gearRatio() / (2.0 * Math.PI);
     config.MagnetSensor.SensorDirection =
-        IntakeConstants.Pivot.CANCODER_CLOCKWISE_POSITIVE
+        CANcoderSpecs.clockwisePositive()
             ? SensorDirectionValue.Clockwise_Positive
             : SensorDirectionValue.CounterClockwise_Positive;
 
@@ -35,13 +38,22 @@ public class SlapdownIOTalonFX extends PivotIOTalonFX {
 
     absolutePositionSignal = cancoder.getAbsolutePosition();
 
-    cancoderToMechanismRatio = IntakeConstants.Pivot.CANCODER_GEAR_RATIO;
+    cancoderToMechanismRatio = CANcoderSpecs.gearRatio();
 
-    seedMotorFromCancoder();
+    seedMotorFromCancoder(5);
   }
 
-  private void seedMotorFromCancoder() {
-    if (!BaseStatusSignal.refreshAll(absolutePositionSignal).isOK()) return;
+  private void seedMotorFromCancoder(int attempts) {
+    boolean refreshSignalSuccessful = false;
+
+    for (int i = 0; i < attempts; i++) {
+      if (BaseStatusSignal.refreshAll(absolutePositionSignal).isOK()) {
+        refreshSignalSuccessful = true;
+        break;
+      }
+    }
+
+    if (!refreshSignalSuccessful) return;
 
     double cancoderRotations = absolutePositionSignal.getValue().in(Rotations);
     double mechanismRotations = cancoderRotations * cancoderToMechanismRatio;

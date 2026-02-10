@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,9 +23,11 @@ public class RollersIOTalonFX implements RollersIO {
 
   private final TalonFX talon;
   private final TalonFXConfiguration config = new TalonFXConfiguration();
+  private final RollersSpecifications specs;
 
   private final VoltageOut voltageOut = new VoltageOut(0.0).withUpdateFreqHz(50.0);
   private final VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
+  private final NeutralOut neutralOut = new NeutralOut();
 
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
@@ -35,21 +38,21 @@ public class RollersIOTalonFX implements RollersIO {
   private final StatusSignal<Current> torqueCurrent;
 
   @SuppressWarnings("removal")
-  public RollersIOTalonFX(int canId, String canBus, RollersSpecifications constants) {
-
+  public RollersIOTalonFX(int canId, String canBus, RollersSpecifications specs) {
+    this.specs = specs;
     talon = new TalonFX(canId, canBus);
 
     config.MotorOutput.Inverted =
-        constants.inverted()
+        specs.inverted()
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimitAmps();
+    config.CurrentLimits.SupplyCurrentLimit = specs.currentLimitAmps();
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    config.Feedback.SensorToMechanismRatio = constants.gearRatio();
+    config.Feedback.SensorToMechanismRatio = specs.gearRatio();
 
     PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(config));
 
@@ -96,7 +99,18 @@ public class RollersIOTalonFX implements RollersIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadPerSec) {
+  public void setAngularVelocity(double velocityRadPerSec) {
     talon.setControl(velocityVoltage.withVelocity(velocityRadPerSec));
+  }
+
+  @Override
+  public void setLinearVelocity(double velocityMetersPerSec) {
+    talon.setControl(
+        velocityVoltage.withVelocity(velocityMetersPerSec / specs.rollerRadiusMeters()));
+  }
+
+  @Override
+  public void stop() {
+    talon.setControl(neutralOut);
   }
 }

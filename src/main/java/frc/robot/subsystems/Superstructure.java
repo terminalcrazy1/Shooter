@@ -1,136 +1,254 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.indexer.BallTunneler;
+import frc.robot.subsystems.indexer.Serializer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Hood;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Turret;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BooleanSupplier;
+import frc.robot.util.ShootingUtil;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
-  public static enum SuperState {
+  /** The state in regards to shooting */
+  public static enum ShootingState {
+    /** Requestable: Completely idle */
     IDLE,
+    /** Requestable: Start running flywheels and tracking target */
     READYING_SHOOTER,
+    /** Intermediate & Requestable: Flywheels are at correct speed, still tracking target */
     READY_TO_SHOOT,
-    EXTENDING_CLIMBER,
-    RETRACTING_CLIMBER,
-    CLIMBER_DEPLOYED
+    /** Requestable: Run ball tunneler to start shooting, still tracking target */
+    SHOOTING
   }
 
-  public static enum RequestCode {
-    /** State change request succeeded */
-    SUCCESS,
-    /**
-     * This state doesn't have requirements, meaning it can't be requested. This likely means it is
-     * a state used internally, rather a state that is meant to be requested externally.
-     */
-    CANNOT_REQUEST,
-    /** The requirements to switch to the state aren't met */
-    REQUIREMENTS_FAILED,
-    /** The current state is already set to this */
-    ALREADY_SET
+  /** The state in regards to intaking */
+  public static enum IntakingState {
+    /** Intermediate: The intake is stowed */
+    STOWED,
+    /** Requestable: The intake is currently being stowed */
+    STOWING,
+    /** Requestable: The intake is currently beind deployed */
+    DEPLOYING,
+    /** Intermediate & Requestable: The intake is deployed and ready to start intaking */
+    INTAKE_READY,
+    /** Requestable: The intake is currently running */
+    INTAKING
   }
 
-  private SuperState currentState = SuperState.IDLE;
-
-  private Map<SuperState, Trigger> stateTriggers =
-      new HashMap<>(); // Triggers for when a state is entered or exited
-  private Map<SuperState, BooleanSupplier> stateRequirements =
-      new HashMap<>(); // BooleanSuppliers which return whether a state can be switched to
+  public final StateMachine<ShootingState> shootingStateMachine =
+      new StateMachine<>(ShootingState.IDLE);
+  public final StateMachine<IntakingState> intakingStateMachine =
+      new StateMachine<>(IntakingState.STOWED);
 
   private final Drive drive;
+  private final Intake intake;
+  private final Serializer serializer;
+  private final BallTunneler ballTunneler;
   private final Turret turret;
+  private final Hood hood;
+  private final Flywheel flywheel;
   private final Supplier<Pose2d> hubPoseSupplier;
 
-  public Superstructure(Drive drive, Turret turret, Supplier<Pose2d> hubPoseSupplier) {
+  public Superstructure(
+      Drive drive,
+      Intake intake,
+      Serializer serializer,
+      BallTunneler ballTunneler,
+      Turret turret,
+      Hood hood,
+      Flywheel flywheel,
+      Supplier<Pose2d> hubPoseSupplier) {
     this.drive = drive;
+    this.intake = intake;
+    this.serializer = serializer;
+    this.ballTunneler = ballTunneler;
     this.turret = turret;
+    this.hood = hood;
+    this.flywheel = flywheel;
     this.hubPoseSupplier = hubPoseSupplier;
-
-    // Initialize state triggers
-    for (SuperState state : SuperState.values()) {
-      stateTriggers.put(
-          state,
-          new Trigger(
-              () ->
-                  this.currentState.equals(state) // Is the current state equal to this state
-                      && DriverStation.isEnabled() // Is the robot enabled
-                      && DriverStation.isTeleop() // Is the robot in teleop
-              ));
-    }
 
     configureStateRequirements();
     configureStateBehaviours();
   }
 
   /** Configure the requirements of each state */
-  public void configureStateRequirements() {
-    // Can always be set to idle
-    stateRequirements.put(SuperState.IDLE, () -> true);
+  private void configureStateRequirements() {
+    // Shooting
+    shootingStateMachine.stateRequirements.put(
+        ShootingState.IDLE, StateMachine.STATE_ALWAYS_AVAILABLE);
+    shootingStateMachine.stateRequirements.put(
+        ShootingState.READYING_SHOOTER, () -> shootingStateMachine.isInState(ShootingState.IDLE));
+    shootingStateMachine.stateRequirements.put(
+        ShootingState.READY_TO_SHOOT, () -> shootingStateMachine.isInState(ShootingState.SHOOTING));
+    shootingStateMachine.stateRequirements.put(
+        ShootingState.SHOOTING, () -> shootingStateMachine.isInState(ShootingState.READY_TO_SHOOT));
+
+    // Intaking
+    intakingStateMachine.stateRequirements.put(
+        IntakingState.STOWING, StateMachine.STATE_ALWAYS_AVAILABLE);
+    intakingStateMachine.stateRequirements.put(
+        IntakingState.DEPLOYING, () -> !intakingStateMachine.isInState(IntakingState.INTAKING));
+    intakingStateMachine.stateRequirements.put(
+        IntakingState.INTAKE_READY, () -> intakingStateMachine.isInState(IntakingState.INTAKING));
+    intakingStateMachine.stateRequirements.put(
+        IntakingState.INTAKING, () -> intakingStateMachine.isInState(IntakingState.INTAKE_READY));
   }
 
   /** Configure what the behaviours of each state are */
-  public void configureStateBehaviours() {
-    // stateTriggers.get(SuperState.IDLE).onTrue(Command); Example Command
+  private void configureStateBehaviours() {
+    // Stop the flywheels when in Idle shooting state
+    shootingStateMachine.stateTriggers.get(ShootingState.IDLE).onTrue(flywheel.stop());
+
+    shootingStateMachine
+        .stateTriggers
+        .get(ShootingState.IDLE)
+        .whileFalse( // When the shooting state isn't idle,
+            turret.lockOntoTarget( // Have the turret track the target
+                () -> ShootingUtil.calculateTurretRelativeAngle(drive::getPose, hubPoseSupplier),
+                () -> drive.getAngularVelocityRadPerSec()))
+        .whileFalse( // Have the hood track the target
+            hood.trackTarget(
+                () -> ShootingUtil.calculateHoodAngle(hubPoseSupplier, drive::getPose)))
+        .whileFalse(
+            flywheel.runVelocityRadPerSec(
+                ShooterConstants.Flywheel.SHOOTING_SPEED.in(
+                    RadiansPerSecond))) // Spin up the flywheels
+        .onTrue(drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts))
+        .onFalse(drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed));
+
+    shootingStateMachine
+        .stateTriggers
+        .get(ShootingState.READYING_SHOOTER) // When the flywheels are getting spun up
+        .and(flywheel.atTargetVelocity()) // And they are at their target velocity
+        .onTrue(forceState(ShootingState.READY_TO_SHOOT)); // then we are ready to shoot
+
+    shootingStateMachine
+        .stateTriggers
+        .get(ShootingState.SHOOTING)
+        .whileTrue(ballTunneler.runTunneler());
+
+    // Intaking state
+    intakingStateMachine
+        .stateTriggers
+        .get(IntakingState.STOWING)
+        .onTrue(intake.stow()) // Stow the intake
+        .and(intake.pivotAtSetpoint()) // If the intake is stowed,
+        .onTrue(forceState(IntakingState.STOWED)); // move to appropriate state
+
+    intakingStateMachine.stateTriggers.get(IntakingState.DEPLOYING).onTrue(intake.deploy());
+
+    intakingStateMachine
+        .stateTriggers
+        .get(IntakingState.DEPLOYING) // Deploy the intake
+        .and(intake.pivotAtSetpoint()) // If the intake arm is deployed,
+        .onTrue(forceState(IntakingState.INTAKE_READY)); // Move to appropriate state
+
+    intakingStateMachine
+        .stateTriggers
+        .get(IntakingState.INTAKING)
+        .whileTrue( // Run the intake based on drivetrain speed
+            intake.runLinearVelocity(
+                () ->
+                    Math.max(
+                        drive.getLinearSpeedMetersPerSec()
+                            * IntakeConstants.Rollers.DRIVETRAIN_TO_INTAKE_SPEED_FACTOR,
+                        IntakeConstants.Rollers.MINIMUM_INTAKE_SPEED.in(MetersPerSecond))));
+
+    shootingStateMachine
+        .stateTriggers
+        .get(ShootingState.IDLE)
+        .and(intakingStateMachine.stateTriggers.get(IntakingState.INTAKING).negate())
+        // While we are running the shooter in anyway (not Idle), or while we are running the intake
+        // rollers
+        .whileFalse(serializer.runSerializer());
   }
 
-  public SuperState getCurrentState() {
-    return this.currentState;
+  /** A command that requests a state for the shooting state machine */
+  public Command requestState(ShootingState targetState) {
+    return shootingStateMachine.requestStateCommand(targetState);
   }
 
-  /**
-   * Attempt to switch state to a requested state. Returns a request code informing whether it
-   * succeeded.
-   *
-   * @param targetState The state to switch to
-   * @return Whether the request was a success or not.
-   */
-  public RequestCode requestState(SuperState targetState) {
-    // If the state is already set
-    if (currentState.equals(targetState)) return RequestCode.ALREADY_SET;
-    // If no state requirement exists
-    if (!stateRequirements.containsKey(targetState)) return RequestCode.CANNOT_REQUEST;
-    // If the state requirement isn't met
-    if (!stateRequirements.get(targetState).getAsBoolean()) return RequestCode.REQUIREMENTS_FAILED;
-
-    forceState(targetState);
-    return RequestCode.SUCCESS;
+  /** A command that requests a state for the intaking state machine */
+  public Command requestState(IntakingState targetState) {
+    return intakingStateMachine.requestStateCommand(targetState);
   }
 
-  /**
-   * Forcibly sets the current state to the specified state. Should only be used for resetting to
-   * IDLE or demo-ing
-   *
-   * @param targetState The state to switch to
-   */
-  public void forceState(SuperState targetState) {
-    this.currentState = targetState;
+  /** Continuous requests a state until it is set or this command is interrupted */
+  public Command continuouslyRequestState(ShootingState targetState) {
+    return shootingStateMachine.runRequestStateCommand(targetState);
   }
 
-  /**
-   * A command that continuously runs <code>requestState</code> until interrupted
-   *
-   * @see #requestState
-   */
-  public Command requestStateCommand(SuperState targetState) {
-    return runOnce(() -> requestState(targetState));
+  /** Continuous requests a state until it is set or this command is interrupted */
+  public Command continuouslyRequestState(IntakingState targetState) {
+    return intakingStateMachine.runRequestStateCommand(targetState);
   }
 
-  /**
-   * A command that achieves the same thing as <code>forceState</code>
-   *
-   * @see #forceState
-   */
-  public Command forceStateCommand(SuperState targetState) {
-    return runOnce(() -> forceState(targetState));
+  /** A command that forces a state for the shooting state machine */
+  public Command forceState(ShootingState targetState) {
+    return shootingStateMachine.forceStateCommand(targetState);
+  }
+
+  /** A command that forces a state for the intaking state machine */
+  public Command forceState(IntakingState targetState) {
+    return intakingStateMachine.forceStateCommand(targetState);
+  }
+
+  /** Toggles Shooting Mode */
+  public Command toggleShootingMode() {
+    return Commands.runOnce(
+        () -> {
+          if (shootingStateMachine.isInState(ShootingState.IDLE)) {
+            shootingStateMachine.requestState(ShootingState.READYING_SHOOTER);
+          } else {
+            shootingStateMachine.requestState(ShootingState.IDLE);
+          }
+        },
+        shootingStateMachine);
+  }
+
+  public Command toggleBumpMode() {
+    return Commands.runOnce(
+        () -> {
+          if (drive.getMaxLinearSpeed().equals(DriveConstants.bumpModeMaxSpeed)) {
+            if (shootingStateMachine.isInState(ShootingState.IDLE)) {
+              drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts);
+            } else {
+              drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed);
+            }
+          } else {
+            drive.setMaxLinearSpeed(DriveConstants.bumpModeMaxSpeed);
+          }
+        },
+        drive);
+  }
+
+  public Command toggleIntakeArm() {
+    return Commands.runOnce(
+        () -> {
+          if (intakingStateMachine.isInState(IntakingState.STOWING)
+              || intakingStateMachine.isInState(IntakingState.STOWED)) {
+            intakingStateMachine.requestState(IntakingState.DEPLOYING);
+          } else {
+            intakingStateMachine.requestState(IntakingState.STOWING);
+          }
+        },
+        intakingStateMachine);
   }
 
   @Override
@@ -149,5 +267,8 @@ public class Superstructure extends SubsystemBase {
                             .getDistance(hubPoseSupplier.get().getTranslation()),
                         drive.getRotation().plus(new Rotation2d(turret.getOrientation())))),
             Rotation2d.kZero));
+
+    Logger.recordOutput("Superstructure/ShootingState", shootingStateMachine.getState().toString());
+    Logger.recordOutput("Superstructure/IntakingState", intakingStateMachine.getState().toString());
   }
 }

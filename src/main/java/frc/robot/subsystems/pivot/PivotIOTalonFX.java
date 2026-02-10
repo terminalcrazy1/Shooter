@@ -35,20 +35,22 @@ public class PivotIOTalonFX implements PivotIO {
   private final StatusSignal<Current> supplyCurrentSignal;
   private final StatusSignal<Current> statorCurrentSignal;
 
+  private double targetAngleRads = 0.0;
+
   private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
   @SuppressWarnings("removal")
-  public PivotIOTalonFX(int canId, String canBus, PivotSpecifications constants) {
+  public PivotIOTalonFX(int canId, String canBus, PivotSpecifications specs) {
     motor = new TalonFX(canId, canBus);
 
     motorConfig.MotorOutput.Inverted =
-        constants.clockwisePositive()
+        specs.clockwisePositive()
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    motorConfig.Feedback.SensorToMechanismRatio = constants.gearRatio();
+    motorConfig.Feedback.SensorToMechanismRatio = specs.gearRatio();
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(motorConfig));
 
@@ -67,6 +69,7 @@ public class PivotIOTalonFX implements PivotIO {
   @Override
   public void setPosition(double angleRads) {
     motor.setControl(positionRequest.withPosition(Radians.of(angleRads)));
+    this.targetAngleRads = angleRads;
   }
 
   @Override
@@ -96,6 +99,7 @@ public class PivotIOTalonFX implements PivotIO {
                     statorCurrentSignal)
                 .isOK());
 
+    inputs.targetPositionRads = targetAngleRads;
     inputs.positionRads = positionSignal.getValue().in(Radians);
     inputs.velocityRadsPerSec = velocitySignal.getValue().in(RadiansPerSecond);
     inputs.appliedVoltage = voltageSignal.getValueAsDouble();

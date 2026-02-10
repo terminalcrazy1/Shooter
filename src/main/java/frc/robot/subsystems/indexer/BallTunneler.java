@@ -1,5 +1,8 @@
 package frc.robot.subsystems.indexer;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.util.LoggedTunableNumber;
@@ -18,6 +21,14 @@ public class BallTunneler extends Rollers {
     super("BallTunneler", io);
 
     io.setControlConstants(kS.get(), kV.get(), kP.get(), kD.get());
+  }
+
+  public Command runTunneler() {
+    return runEnd(
+        () ->
+            io.setAngularVelocity(
+                IndexerConstants.BallTunneler.TUNNELING_SPEED.in(RadiansPerSecond)),
+        () -> io.stop());
   }
 
   @Override

@@ -33,6 +33,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -117,6 +118,9 @@ public class Drive extends SubsystemBase {
           new Pose2d(
               new Translation2d(Units.inchesToMeters(651.22), Units.inchesToMeters(317.69)),
               Rotation2d.k180deg));
+
+  // For controlling drive speed
+  private LinearVelocity currentMaxSpeed = TunerConstants.kSpeedAt12Volts;
 
   public Drive(
       GyroIO gyroIO,
@@ -327,7 +331,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -374,9 +378,19 @@ public class Drive extends SubsystemBase {
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
+  /** Sets the drivetrain maximum speed */
+  public Command setMaxLinearSpeed(LinearVelocity maxSpeed) {
+    return runOnce(() -> currentMaxSpeed = maxSpeed);
+  }
+
+  /** Returns the maximum linear speed */
+  public LinearVelocity getMaxLinearSpeed() {
+    return currentMaxSpeed;
+  }
+
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    return currentMaxSpeed.in(MetersPerSecond);
   }
 
   /** Returns the maximum angular speed in radians per sec. */
@@ -387,6 +401,13 @@ public class Drive extends SubsystemBase {
   /** Returns the current angular velocity of the drivetrain in radians per sec */
   public double getAngularVelocityRadPerSec() {
     return getChassisSpeeds().omegaRadiansPerSecond;
+  }
+
+  /** Returns the current speed of the entire drivetrain */
+  public double getLinearSpeedMetersPerSec() {
+    ChassisSpeeds speeds = getChassisSpeeds();
+
+    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
   }
 
   /** Returns an array of module translations. */

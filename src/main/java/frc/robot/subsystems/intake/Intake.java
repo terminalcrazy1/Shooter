@@ -1,5 +1,10 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.rollers.Rollers;
@@ -7,7 +12,6 @@ import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.util.LoggedTunableNumber;
 
 public class Intake extends Rollers {
-
   private final LoggedTunableNumber rollers_kS =
       new LoggedTunableNumber("Intake/kS", IntakeConstants.Rollers.SYSTEM_CONSTANTS.kS);
   private final LoggedTunableNumber rollers_kV =
@@ -37,6 +41,23 @@ public class Intake extends Rollers {
         rollers_kS.get(), rollers_kV.get(), rollers_kP.get(), rollers_kD.get());
     pivotIO.setControlConstants(
         pivot_kS.get(), pivot_kV.get(), pivot_kA.get(), pivot_kP.get(), pivot_kD.get());
+  }
+
+  public Command stow() {
+    return pivot
+        .setTargetAngle(IntakeConstants.Pivot.STOWED_ANGLE)
+        .alongWith(this.runOnce(() -> io.stop()));
+  }
+
+  public Command deploy() {
+    return pivot.setTargetAngle(IntakeConstants.Pivot.DEPLOYED_ANGLE);
+  }
+
+  public Trigger pivotAtSetpoint() {
+    return new Trigger(
+        () ->
+            MathUtil.isNear(
+                pivot.getTargetOrientation().in(Degrees), pivot.getOrientation().in(Degrees), 5));
   }
 
   @Override
