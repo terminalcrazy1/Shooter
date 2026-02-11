@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -56,6 +57,14 @@ public class DriveCommands {
     return new Pose2d(Translation2d.kZero, linearDirection)
         .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
         .getTranslation();
+  }
+
+  public static Command resetGyro(Drive drive) {
+    return Commands.runOnce(
+        () ->
+            drive.setPose(
+                new Pose2d(drive.getPose().getTranslation(), DriveConstants.getZeroOrientation())),
+        drive);
   }
 
   /**

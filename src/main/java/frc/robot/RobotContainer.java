@@ -13,11 +13,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -326,15 +326,7 @@ public class RobotContainer {
             () -> -driverController.getRightX()));
 
     // Reset gyro to 0° when B button is pressed
-    driverController
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    driverController.start().onTrue(DriveCommands.resetGyro(drive).ignoringDisable(true));
 
     driverController
         .y()
@@ -368,6 +360,20 @@ public class RobotContainer {
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> Rotation2d.kCW_90deg));
+
+    driverController
+        .rightTrigger()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> {
+                  Translation2d lookatVector =
+                      getAllianceHubPose().getTranslation().minus(drive.getPose().getTranslation());
+
+                  return new Rotation2d(lookatVector.getX(), lookatVector.getY());
+                }));
 
     // Shooting state reset
     driverController.back().onTrue(superstructure.forceState(ShootingState.IDLE));
