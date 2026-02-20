@@ -34,33 +34,33 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.indexer.BallTunneler;
-import frc.robot.subsystems.indexer.IndexerConstants;
-import frc.robot.subsystems.indexer.Serializer;
+// import frc.robot.subsystems.indexer.BallTunneler;
+// import frc.robot.subsystems.indexer.IndexerConstants;
+// import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.leds.LEDs;
+// import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOSim;
-import frc.robot.subsystems.pivot.PivotIOTalonFX;
+// import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.pivot.PivotIOTalonFXWithCANcoder;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
-import frc.robot.subsystems.shooter.Flywheel;
-import frc.robot.subsystems.shooter.FlywheelIO;
-import frc.robot.subsystems.shooter.FlywheelIOSim;
-import frc.robot.subsystems.shooter.FlywheelIOTalonFX;
-import frc.robot.subsystems.shooter.Hood;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.Turret;
+// import frc.robot.subsystems.shooter.Flywheel;
+// import frc.robot.subsystems.shooter.FlywheelIO;
+// import frc.robot.subsystems.shooter.FlywheelIOSim;
+// import frc.robot.subsystems.shooter.FlywheelIOTalonFX;
+// import frc.robot.subsystems.shooter.Hood;
+// import frc.robot.subsystems.shooter.ShooterConstants;
+// import frc.robot.subsystems.shooter.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.ComponentPoseUtil;
+// import frc.robot.util.ComponentPoseUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -75,14 +75,14 @@ public class RobotContainer {
   private final Drive drive;
   private final Climber climber;
   private final Intake intake;
-  private final Serializer serializer;
-  private final BallTunneler ballTunneler;
+  //   private final Serializer serializer;
+  //   private final BallTunneler ballTunneler;
   private final Vision vision;
-  private final LEDs leds;
+  //   private final LEDs leds;
 
-  private final Turret turret;
-  private final Hood hood;
-  private final Flywheel flywheel;
+  //   private final Turret turret;
+  //   private final Hood hood;
+  //   private final Flywheel flywheel;
 
   private final Superstructure superstructure;
 
@@ -150,18 +150,18 @@ public class RobotContainer {
                     IntakeConstants.Pivot.PIVOT_SPECS,
                     IntakeConstants.Pivot.CANCODER_SPECS));
 
-        serializer =
-            new Serializer(
-                new RollersIOTalonFX(
-                    IndexerConstants.Serializer.CAN_ID,
-                    IndexerConstants.CANBUS,
-                    IndexerConstants.Serializer.ROLLERS_SPECS));
-        ballTunneler =
-            new BallTunneler(
-                new RollersIOTalonFX(
-                    IndexerConstants.BallTunneler.CAN_ID,
-                    IndexerConstants.CANBUS,
-                    IndexerConstants.BallTunneler.ROLLERS_SPECS));
+        // serializer =
+        //     new Serializer(
+        //         new RollersIOTalonFX(
+        //             IndexerConstants.Serializer.CAN_ID,
+        //             IndexerConstants.CANBUS,
+        //             IndexerConstants.Serializer.ROLLERS_SPECS));
+        // ballTunneler =
+        //     new BallTunneler(
+        //         new RollersIOTalonFX(
+        //             IndexerConstants.BallTunneler.CAN_ID,
+        //             IndexerConstants.CANBUS,
+        //             IndexerConstants.BallTunneler.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -172,23 +172,23 @@ public class RobotContainer {
                 new VisionIOLimelight(
                     VisionConstants.camera2Name, () -> drive.getPose().getRotation(), false));
 
-        turret =
-            new Turret(
-                new PivotIOTalonFXWithCANcoder(
-                    ShooterConstants.Turret.MOTOR_ID,
-                    ShooterConstants.Turret.CANCODER_ID,
-                    ShooterConstants.CANBUS,
-                    ShooterConstants.Turret.PIVOT_SPECS,
-                    ShooterConstants.Turret.CANCODER_SPECS));
-        hood =
-            new Hood(
-                new PivotIOTalonFX(
-                    ShooterConstants.Hood.CAN_ID,
-                    ShooterConstants.CANBUS,
-                    ShooterConstants.Hood.SPECS));
-        flywheel = new Flywheel(new FlywheelIOTalonFX());
+        // turret =
+        //     new Turret(
+        //         new PivotIOTalonFXWithCANcoder(
+        //             ShooterConstants.Turret.MOTOR_ID,
+        //             ShooterConstants.Turret.CANCODER_ID,
+        //             ShooterConstants.CANBUS,
+        //             ShooterConstants.Turret.PIVOT_SPECS,
+        //             ShooterConstants.Turret.CANCODER_SPECS));
+        // hood =
+        //     new Hood(
+        //         new PivotIOTalonFX(
+        //             ShooterConstants.Hood.CAN_ID,
+        //             ShooterConstants.CANBUS,
+        //             ShooterConstants.Hood.SPECS));
+        // flywheel = new Flywheel(new FlywheelIOTalonFX());
 
-        leds = new LEDs();
+        // leds = new LEDs();
         break;
 
       case SIM:
@@ -211,18 +211,18 @@ public class RobotContainer {
                     IntakeConstants.Rollers.SPECS),
                 new PivotIOSim(DCMotor.getKrakenX60(1), IntakeConstants.Pivot.SYSTEM_CONSTANTS));
 
-        serializer =
-            new Serializer(
-                new RollersIOSim(
-                    DCMotor.getKrakenX60(1),
-                    IndexerConstants.Serializer.SYSTEM_CONSTANTS,
-                    IndexerConstants.Serializer.ROLLERS_SPECS));
-        ballTunneler =
-            new BallTunneler(
-                new RollersIOSim(
-                    DCMotor.getKrakenX44(1),
-                    IndexerConstants.BallTunneler.SYSTEM_CONSTANTS,
-                    IndexerConstants.BallTunneler.ROLLERS_SPECS));
+        // serializer =
+        //     new Serializer(
+        //         new RollersIOSim(
+        //             DCMotor.getKrakenX60(1),
+        //             IndexerConstants.Serializer.SYSTEM_CONSTANTS,
+        //             IndexerConstants.Serializer.ROLLERS_SPECS));
+        // ballTunneler =
+        //     new BallTunneler(
+        //         new RollersIOSim(
+        //             DCMotor.getKrakenX44(1),
+        //             IndexerConstants.BallTunneler.SYSTEM_CONSTANTS,
+        //             IndexerConstants.BallTunneler.ROLLERS_SPECS));
         vision =
             Vision.createPerCameraVision(
                 drive,
@@ -238,15 +238,16 @@ public class RobotContainer {
                     VisionConstants.camera2Name,
                     VisionConstants.robotToCamera2,
                     () -> drive.getPose()));
-        turret =
-            new Turret(
-                new PivotIOSim(DCMotor.getKrakenX60(1), ShooterConstants.Turret.SYSTEM_CONSTANTS));
-        hood =
-            new Hood(
-                new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
-        flywheel = new Flywheel(new FlywheelIOSim());
+        // turret =
+        //     new Turret(
+        //         new PivotIOSim(DCMotor.getKrakenX60(1),
+        // ShooterConstants.Turret.SYSTEM_CONSTANTS));
+        // hood =
+        //     new Hood(
+        //         new PivotIOSim(DCMotor.getKrakenX44(1), ShooterConstants.Hood.SYSTEM_CONSTANTS));
+        // flywheel = new Flywheel(new FlywheelIOSim());
 
-        leds = new LEDs();
+        // leds = new LEDs();
         break;
 
       default:
@@ -265,27 +266,28 @@ public class RobotContainer {
             Vision.createPerCameraVision(
                 drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
 
-        turret = new Turret(new PivotIO() {});
-        hood = new Hood(new PivotIO() {});
-        flywheel = new Flywheel(new FlywheelIO() {});
-        serializer = new Serializer(new RollersIO() {});
-        leds = new LEDs();
-        ballTunneler = new BallTunneler(new RollersIO() {});
+        // turret = new Turret(new PivotIO() {});
+        // hood = new Hood(new PivotIO() {});
+        // flywheel = new Flywheel(new FlywheelIO() {});
+        // serializer = new Serializer(new RollersIO() {});
+        // leds = new LEDs();
+        // ballTunneler = new BallTunneler(new RollersIO() {});
 
         break;
     }
     NamedCommands.registerCommand("StowIntake", intake.pivot.setTargetAngle(Degrees.of(0)));
     NamedCommands.registerCommand("DeployIntake", intake.pivot.setTargetAngle(Degrees.of(-90)));
-    this.superstructure =
-        new Superstructure(
-            drive,
-            intake,
-            serializer,
-            ballTunneler,
-            turret,
-            hood,
-            flywheel,
-            () -> getAllianceHubPose());
+    this.superstructure = null;
+    // this.superstructure =
+    //     new Superstructure(
+    //         drive,
+    //         intake,
+    //         serializer,
+    //         ballTunneler,
+    //         // turret,
+    //         // hood,
+    //         // flywheel,
+    //         () -> getAllianceHubPose());
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -416,6 +418,6 @@ public class RobotContainer {
   }
 
   public void updateComponentPoses() {
-    ComponentPoseUtil.publishComponentPoses(serializer, turret, intake.pivot, climber);
+    // ComponentPoseUtil.publishComponentPoses(serializer, turret, intake.pivot, climber);
   }
 }

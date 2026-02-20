@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+// import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,11 +16,11 @@ import frc.robot.subsystems.indexer.BallTunneler;
 import frc.robot.subsystems.indexer.Serializer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.shooter.Flywheel;
-import frc.robot.subsystems.shooter.Hood;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.Turret;
-import frc.robot.util.ShootingUtil;
+// import frc.robot.subsystems.shooter.Flywheel;
+// import frc.robot.subsystems.shooter.Hood;
+// import frc.robot.subsystems.shooter.ShooterConstants;
+// import frc.robot.subsystems.shooter.Turret;
+// import frc.robot.util.ShootingUtil;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -60,28 +60,28 @@ public class Superstructure extends SubsystemBase {
   private final Intake intake;
   private final Serializer serializer;
   private final BallTunneler ballTunneler;
-  private final Turret turret;
-  private final Hood hood;
-  private final Flywheel flywheel;
-  private final Supplier<Pose2d> hubPoseSupplier;
+  // private final Turret turret;
+  // private final Hood hood;
+  // private final Flywheel flywheel;
+  // private final Supplier<Pose2d> hubPoseSupplier;
 
   public Superstructure(
       Drive drive,
       Intake intake,
       Serializer serializer,
       BallTunneler ballTunneler,
-      Turret turret,
-      Hood hood,
-      Flywheel flywheel,
+      // Turret turret,
+      // Hood hood,
+      // Flywheel flywheel,
       Supplier<Pose2d> hubPoseSupplier) {
     this.drive = drive;
     this.intake = intake;
     this.serializer = serializer;
     this.ballTunneler = ballTunneler;
-    this.turret = turret;
-    this.hood = hood;
-    this.flywheel = flywheel;
-    this.hubPoseSupplier = hubPoseSupplier;
+    // this.turret = turret;
+    // this.hood = hood;
+    // this.flywheel = flywheel;
+    // this.hubPoseSupplier = hubPoseSupplier;
 
     configureStateRequirements();
     configureStateBehaviours();
@@ -113,30 +113,30 @@ public class Superstructure extends SubsystemBase {
   /** Configure what the behaviours of each state are */
   private void configureStateBehaviours() {
     // Stop the flywheels when in Idle shooting state
-    shootingStateMachine.stateTriggers.get(ShootingState.IDLE).onTrue(flywheel.stop());
+    // shootingStateMachine.stateTriggers.get(ShootingState.IDLE).onTrue(flywheel.stop());
 
-    shootingStateMachine
-        .stateTriggers
-        .get(ShootingState.IDLE)
-        .whileFalse( // When the shooting state isn't idle,
-            turret.lockOntoTarget( // Have the turret track the target
-                () -> ShootingUtil.calculateTurretRelativeAngle(drive::getPose, hubPoseSupplier),
-                () -> drive.getAngularVelocityRadPerSec()))
-        .whileFalse( // Have the hood track the target
-            hood.trackTarget(
-                () -> ShootingUtil.calculateHoodAngle(hubPoseSupplier, drive::getPose)))
-        .whileFalse(
-            flywheel.runVelocityRadPerSec(
-                ShooterConstants.Flywheel.SHOOTING_SPEED.in(
-                    RadiansPerSecond))) // Spin up the flywheels
-        .onTrue(drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts))
-        .onFalse(drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed));
+    // shootingStateMachine
+    //     .stateTriggers
+    //     .get(ShootingState.IDLE)
+    //     .whileFalse( // When the shooting state isn't idle,
+    //         turret.lockOntoTarget( // Have the turret track the target
+    //             () -> ShootingUtil.calculateTurretRelativeAngle(drive::getPose, hubPoseSupplier),
+    //             () -> drive.getAngularVelocityRadPerSec()))
+    //     .whileFalse( // Have the hood track the target
+    //         hood.trackTarget(
+    //             () -> ShootingUtil.calculateHoodAngle(hubPoseSupplier, drive::getPose)))
+    //     .whileFalse(
+    //         flywheel.runVelocityRadPerSec(
+    //             ShooterConstants.Flywheel.SHOOTING_SPEED.in(
+    //                 RadiansPerSecond))) // Spin up the flywheels
+    //     .onTrue(drive.setMaxLinearSpeed(TunerConstants.kSpeedAt12Volts))
+    //     .onFalse(drive.setMaxLinearSpeed(DriveConstants.shootingModeMaxSpeed));
 
-    shootingStateMachine
-        .stateTriggers
-        .get(ShootingState.READYING_SHOOTER) // When the flywheels are getting spun up
-        .and(flywheel.atTargetVelocity()) // And they are at their target velocity
-        .onTrue(forceState(ShootingState.READY_TO_SHOOT)); // then we are ready to shoot
+    // shootingStateMachine
+    //     .stateTriggers
+    //     .get(ShootingState.READYING_SHOOTER) // When the flywheels are getting spun up
+    //     .and(flywheel.atTargetVelocity()) // And they are at their target velocity
+    //     .onTrue(forceState(ShootingState.READY_TO_SHOOT)); // then we are ready to shoot
 
     shootingStateMachine
         .stateTriggers
@@ -253,20 +253,20 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput(
-        "Superstructure/Components/TurretTarget",
-        new Pose2d(
-            drive
-                .getPose()
-                .getTranslation()
-                .plus(
-                    new Translation2d(
-                        drive
-                            .getPose()
-                            .getTranslation()
-                            .getDistance(hubPoseSupplier.get().getTranslation()),
-                        drive.getRotation().plus(new Rotation2d(turret.getOrientation())))),
-            Rotation2d.kZero));
+    // Logger.recordOutput(
+    //       "Superstructure/Components/TurretTarget",
+    //       new Pose2d(
+    //           drive
+    //               .getPose()
+    //               .getTranslation()
+    //               .plus(
+    //                   new Translation2d(
+    //                       drive
+    //                           .getPose()
+    //                           .getTranslation()
+    //                           .getDistance(hubPoseSupplier.get().getTranslation()),
+    //                       drive.getRotation().plus(new Rotation2d(turret.getOrientation())))),
+    //           Rotation2d.kZero));
 
     Logger.recordOutput("Superstructure/ShootingState", shootingStateMachine.getState().toString());
     Logger.recordOutput("Superstructure/IntakingState", intakingStateMachine.getState().toString());
