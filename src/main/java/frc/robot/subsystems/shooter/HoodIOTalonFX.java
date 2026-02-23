@@ -13,7 +13,13 @@ public class HoodIOTalonFX implements HoodIO {
     motor.setVoltage(volts);
   }
 
-  public void setAngle() {}
+  public void setAngle(double angle) {
+    double motorAngle = motor.getPosition().getValueAsDouble();
+    double hoodAngle = (motorAngle * 360) / 96;
+    if (angle != hoodAngle) {
+      // do pid here
+    }
+  }
 
   public void updateInputs(HoodInputsAutoLogged inputs) {}
 }
