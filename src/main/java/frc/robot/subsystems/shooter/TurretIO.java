@@ -8,7 +8,7 @@ public interface TurretIO {
 
   public default void setVolts(double volts) {}
 
-  public default void setAngle() {}
+  public default void setAngle(double angle) {}
 
   public default void updateInputs(TurretInputsAutoLogged inputs) {}
 }

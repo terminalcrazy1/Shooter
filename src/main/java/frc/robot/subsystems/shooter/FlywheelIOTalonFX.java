@@ -15,7 +15,9 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     reverseMotor.setVoltage(-volts);
   }
 
-  public void setVelocity() {}
+  public double getVelocity(double velocity) {
+    return forwardMotor.getVelocity().getValueAsDouble();
+  }
 
   public void updateInputs(FlywheelInputsAutoLogged inputs) {}
 }
