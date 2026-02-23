@@ -3,7 +3,7 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLog;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-public class HoodTalonFX implements Hood {
+public class HoodIOTalonFX implements HoodIO {
   private TalonFX motor = new TalonFX(23);
   
   @AutoLog

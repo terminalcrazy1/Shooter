@@ -3,7 +3,7 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLog;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-public class FlywheelTalonFX implements Flywheel {
+public class FlywheelIOTalonFX implements FlywheelIO {
   private TalonFX forwardMotor = new TalonFX(19);
   private TalonFX reverseMotor = new TalonFX(20);
 

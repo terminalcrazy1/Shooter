@@ -2,7 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface Hood {
+public interface HoodIO {
   @AutoLog
   class HoodInputs {}
 
