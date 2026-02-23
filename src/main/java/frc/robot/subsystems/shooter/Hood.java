@@ -6,7 +6,7 @@ public interface Hood {
   @AutoLog
   class HoodInputs {}
 
-  public default void setVolts() {}
+  public default void setVolts(double volts) {}
 
   public default void setAngle() {}
 

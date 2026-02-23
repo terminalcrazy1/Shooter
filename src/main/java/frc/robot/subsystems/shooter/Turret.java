@@ -6,7 +6,7 @@ public interface Turret {
   @AutoLog
   class TurretInputs {}
 
-  public default void setVolts() {}
+  public default void setVolts(double volts) {}
 
   public default void setAngle() {}
 

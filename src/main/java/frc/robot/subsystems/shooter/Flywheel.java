@@ -6,7 +6,7 @@ public interface Flywheel {
   @AutoLog
   class FlywheelInputs {}
 
-  public default void setVolts() {}
+  public default void setVolts(double volts) {}
 
   public default void setVelocity() {}
 
